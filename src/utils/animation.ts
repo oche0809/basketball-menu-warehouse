@@ -1,4 +1,5 @@
 import { BUILTIN_ANIMATIONS } from '../data/menuAnimations'
+import officialData from '../data/officialAnimations.json'
 import type { AnimAction, AnimPlayer, AnimPoint, AnimStep, MenuAnimation, PracticeMenu } from '../types/menu'
 
 // ゴール（リング）の位置（座標は 0〜100。x：左→右、y：上のエンドライン→下のハーフライン）
@@ -122,9 +123,30 @@ export function normalizeAnimation(v: unknown): MenuAnimation | null {
   return validateAnimation(v).animation
 }
 
-// メニュー自身のアニメーションがあればそれを、なければアプリに用意した代表メニューのものを使う
+// 公式アニメーション（GitHubで管理する src/data/officialAnimations.json。ビルドに含まれ、全員に同じものが表示される）。
+// チェックに通らない項目は表示に使わず、エラーとして管理画面に出す
+export const OFFICIAL_ANIMATIONS: Record<string, MenuAnimation> = {}
+export const OFFICIAL_ANIMATION_ERRORS: Record<string, string[]> = {}
+for (const [id, value] of Object.entries((officialData as { animations?: Record<string, unknown> }).animations ?? {})) {
+  const { animation, errors } = validateAnimation(value)
+  // アプリ内蔵の動きがあるメニューは、公式データでも置き換えない
+  if (BUILTIN_ANIMATIONS[id]) OFFICIAL_ANIMATION_ERRORS[id] = ['アプリ内蔵の動きがあるメニューのため、公式データでは置き換えません。']
+  else if (animation) OFFICIAL_ANIMATIONS[id] = animation
+  else OFFICIAL_ANIMATION_ERRORS[id] = errors
+}
+
+// 表示に使う動きの出どころ。優先順位：このブラウザで保存した動き → 公式 → アプリ内蔵 → なし
+export type AnimationSource = 'personal' | 'official' | 'builtin'
+export function getAnimationSource(menu: PracticeMenu): AnimationSource | null {
+  if (menu.animation && normalizeAnimation(menu.animation)) return 'personal'
+  if (OFFICIAL_ANIMATIONS[menu.id]) return 'official'
+  if (BUILTIN_ANIMATIONS[menu.id]) return 'builtin'
+  return null
+}
+
+// メニュー自身のアニメーションがあればそれを、なければ公式、アプリに用意した代表メニューのものの順に使う
 export function getMenuAnimation(menu: PracticeMenu): MenuAnimation | null {
-  return (menu.animation && normalizeAnimation(menu.animation)) || BUILTIN_ANIMATIONS[menu.id] || null
+  return (menu.animation && normalizeAnimation(menu.animation)) || OFFICIAL_ANIMATIONS[menu.id] || BUILTIN_ANIMATIONS[menu.id] || null
 }
 
 // 画面で「🎬 動きを見る」が出るメニューか（メニュー自身の動き・アプリ内蔵の動きのどちらか）

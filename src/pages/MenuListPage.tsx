@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { MenuCard } from '../components/MenuCard'
-import { BulkAnimationDialog } from '../components/BulkAnimationDialog'
+import { AnimationManagerDialog } from '../components/AnimationManagerDialog'
 import { VideoMenuDialog } from '../components/VideoMenuDialog'
 import { CATEGORIES } from '../data/options'
 import type { MenuAnimation, MenuInput, PracticeMenu } from '../types/menu'
@@ -120,7 +120,7 @@ export function MenuListPage({ menus, onToggleFavorite, favoritesOnly, initialCa
               onClick={() => setBulkOpen(true)}
               className="rounded-lg border border-orange-300 bg-white px-4 py-2.5 font-bold text-orange-700 hover:bg-orange-50"
             >
-              🎬 アニメーション一括作成
+              🎬 アニメーション管理
             </button>
           )}
           {onAddMenus && (
@@ -134,7 +134,7 @@ export function MenuListPage({ menus, onToggleFavorite, favoritesOnly, initialCa
           )}
         </div>
       </div>
-      {bulkOpen && onSaveAnimations && <BulkAnimationDialog menus={menus} onSave={onSaveAnimations} onClose={() => setBulkOpen(false)} />}
+      {bulkOpen && onSaveAnimations && <AnimationManagerDialog menus={menus} onSaveAnimations={onSaveAnimations} onClose={() => setBulkOpen(false)} />}
       {videoOpen && onAddMenus && (
         <VideoMenuDialog
           menus={menus}
