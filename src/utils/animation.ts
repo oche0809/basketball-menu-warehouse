@@ -127,6 +127,12 @@ export function getMenuAnimation(menu: PracticeMenu): MenuAnimation | null {
   return (menu.animation && normalizeAnimation(menu.animation)) || BUILTIN_ANIMATIONS[menu.id] || null
 }
 
+// 画面で「🎬 動きを見る」が出るメニューか（メニュー自身の動き・アプリ内蔵の動きのどちらか）
+export const hasAnimation = (menu: PracticeMenu) => getMenuAnimation(menu) !== null
+
+// 動きのデータを持っているが、チェックに通らず表示できない（一括作成では上書きしない）
+export const hasBrokenAnimation = (menu: PracticeMenu) => menu.animation !== undefined && normalizeAnimation(menu.animation) === null
+
 // 各ステップ終了時点の状態（選手の位置とボールの場所）。frames[0] がはじめの配置、frames[k] が STEP k の後
 export type Frame = { pos: Record<string, AnimPoint>; holder: string | null; ballAt: AnimPoint }
 

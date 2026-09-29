@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { MenuCard } from '../components/MenuCard'
+import { BulkAnimationDialog } from '../components/BulkAnimationDialog'
 import { VideoMenuDialog } from '../components/VideoMenuDialog'
 import { CATEGORIES } from '../data/options'
-import type { MenuInput, PracticeMenu } from '../types/menu'
+import type { MenuAnimation, MenuInput, PracticeMenu } from '../types/menu'
 import { ALL, DURATION_RANGES, EMPTY_CONDITIONS, PLAYER_RANGES, buildOptions, filterMenus, normalizeForSearch, type Conditions } from '../utils/filters'
 
 const POPULAR_TAG_COUNT = 12
@@ -74,10 +75,13 @@ type Props = {
   favoritesOnly?: boolean
   initialCategory?: string
   onAddMenus?: (inputs: MenuInput[]) => void
+  // 動きがないメニューへの一括保存（保存した件数を返す）
+  onSaveAnimations?: (items: { id: string; animation: MenuAnimation }[]) => number
 }
 
-export function MenuListPage({ menus, onToggleFavorite, favoritesOnly, initialCategory, onAddMenus }: Props) {
+export function MenuListPage({ menus, onToggleFavorite, favoritesOnly, initialCategory, onAddMenus, onSaveAnimations }: Props) {
   const [videoOpen, setVideoOpen] = useState(false)
+  const [bulkOpen, setBulkOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState(initialCategory && CATEGORIES.includes(initialCategory) ? initialCategory : ALL)
   const [conditions, setConditions] = useState<Conditions>(EMPTY_CONDITIONS)
@@ -109,16 +113,28 @@ export function MenuListPage({ menus, onToggleFavorite, favoritesOnly, initialCa
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">{favoritesOnly ? '♥ お気に入り' : 'メニュー一覧'}</h1>
-        {onAddMenus && (
-          <button
-            type="button"
-            onClick={() => setVideoOpen(true)}
-            className="rounded-lg border border-violet-300 bg-violet-50 px-4 py-2.5 font-bold text-violet-800 hover:bg-violet-100"
-          >
-            🎥 動画からメニューを追加
-          </button>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {onSaveAnimations && (
+            <button
+              type="button"
+              onClick={() => setBulkOpen(true)}
+              className="rounded-lg border border-orange-300 bg-white px-4 py-2.5 font-bold text-orange-700 hover:bg-orange-50"
+            >
+              🎬 アニメーション一括作成
+            </button>
+          )}
+          {onAddMenus && (
+            <button
+              type="button"
+              onClick={() => setVideoOpen(true)}
+              className="rounded-lg border border-violet-300 bg-violet-50 px-4 py-2.5 font-bold text-violet-800 hover:bg-violet-100"
+            >
+              🎥 動画からメニューを追加
+            </button>
+          )}
+        </div>
       </div>
+      {bulkOpen && onSaveAnimations && <BulkAnimationDialog menus={menus} onSave={onSaveAnimations} onClose={() => setBulkOpen(false)} />}
       {videoOpen && onAddMenus && (
         <VideoMenuDialog
           menus={menus}

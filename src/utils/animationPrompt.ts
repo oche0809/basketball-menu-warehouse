@@ -1,6 +1,6 @@
 import type { MenuAnimation, PracticeMenu } from '../types/menu'
 import { extractJSON } from './aiPlan'
-import { validateAnimation } from './animation'
+import { hasAnimation, validateAnimation } from './animation'
 
 const orNone = (v: string | undefined) => v?.trim() || '（記載なし）'
 
@@ -8,10 +8,9 @@ const orNone = (v: string | undefined) => v?.trim() || '（記載なし）'
 
 const INTRO = 'あなたは日本の中学校バスケットボール部の指導を手伝うコーチです。'
 
-function menuSection(menu: PracticeMenu) {
+function menuLines(menu: PracticeMenu) {
   const source = [menu.sourceTitle, menu.sourceUrl].filter((v) => v?.trim()).join(' ')
-  return `## 練習メニュー
-- メニュー名：${menu.title}
+  return `- メニュー名：${menu.title}
 - カテゴリ：${menu.category}
 - 難易度：${menu.difficulty}
 - 対象：${menu.targetLevel}
@@ -22,6 +21,11 @@ function menuSection(menu: PracticeMenu) {
 - 手順：${orNone(menu.instructions)}
 - 指導ポイント：${menu.coachingPoints.join('／') || '（記載なし）'}
 ${source ? `- 参考（文字情報のみ。アクセスは不要です）：${source}\n` : ''}`
+}
+
+function menuSection(menu: PracticeMenu) {
+  return `## 練習メニュー
+${menuLines(menu)}`
 }
 
 // 動きの質についての約束（新規作成・修正の両方）
@@ -47,11 +51,8 @@ const COURT_AND_TYPES = `## コートと座標
   - "wait"（待つ・構える）：{"type": "wait"}
 - player・from・to には、players にいる選手の id だけを使ってください。`
 
-const ANSWER_FORMAT = `## 回答形式
-次の形の JSON だけを返してください。Markdown のコードブロックや、前後の説明文は付けないでください。
-
-{
-  "animation": {
+// 回答例の animation（新規作成・修正・一括作成で共通）
+const EXAMPLE_ANIMATION = `{
     "court": "half",
     "players": [
       { "id": "O1", "label": "1", "team": "offense", "start": { "x": 50, "y": 64 } },
@@ -65,7 +66,13 @@ const ANSWER_FORMAT = `## 回答形式
       { "text": "2番から1番へリターンパス。", "actions": [{ "type": "pass", "from": "O2", "to": "O1" }] },
       { "text": "1番がシュート。", "actions": [{ "type": "shoot", "player": "O1" }] }
     ]
-  }
+  }`
+
+const ANSWER_FORMAT = `## 回答形式
+次の形の JSON だけを返してください。Markdown のコードブロックや、前後の説明文は付けないでください。
+
+{
+  "animation": ${EXAMPLE_ANIMATION}
 }`
 
 // メニューの「動き」を作ってもらうための依頼文（Claudeに手動で貼り付ける。アプリからは通信しない）
@@ -124,4 +131,110 @@ export function parseAnimationAnswer(answer: string): { animation: MenuAnimation
     return { animation: null, errors: ['回答に "animation" が見つかりませんでした。依頼文で指定した形式（{ "animation": { ... } }）の回答を貼り付けてください。'] }
   }
   return validateAnimation(o.animation)
+}
+
+// ---- 一括作成（未設定メニューを20件ずつ） ----
+
+export const BULK_BATCH_SIZE = 20
+
+// 一括作成用に、メニューごとの情報を詳しく並べる（道具・よくあるミス・発展・タグも判断材料にする）
+function bulkMenuBlock(menu: PracticeMenu, index: number) {
+  return `### ${index + 1}. menuId: ${menu.id}
+${menuLines(menu)}- 必要な道具：${menu.equipment.join('、') || 'なし'}
+- よくあるミス：${menu.commonMistakes.join('／') || '（記載なし）'}
+- 発展：${orNone(menu.progression)}
+- 簡単にする方法：${orNone(menu.regression)}
+- タグ：${menu.tags.join('、') || 'なし'}`
+}
+
+// 動きがまだないメニューをまとめて依頼する文（Claudeに手動で貼り付ける。アプリからは通信しない）
+export function buildBulkAnimationPrompt(menus: PracticeMenu[]): string {
+  const example = EXAMPLE_ANIMATION.replace(/\n/g, '\n    ')
+  return `${INTRO}
+次の${menus.length}件の練習メニューについて、それぞれの「動き」を、ハーフコート上の選手とボールの動きとして JSON で表してください。
+指導者と部員が画面で見て、練習の動きをイメージできるようにするために使います。派手な動きは必要ありません。
+
+## 練習メニュー（${menus.length}件）
+${menus.map(bulkMenuBlock).join('\n\n')}
+
+## 守ること（すべてのメニューで共通）
+- 各メニューの説明から確認できない動きを、推測で付け足さないでください（例：「3人組でパス」としか書かれていないなら、スクリーンやカット、ディフェンスのローテーションなどを加えない）。
+- 目的・準備・手順・指導ポイントから合理的に分かる範囲だけを表し、分からない部分はシンプルにしてください。
+- 動きを判断できないメニューは、無理に作らず items に含めないでください（全件を返す必要はありません）。
+- menuId は上に書かれた値を1文字も変えずに使ってください。1つの menuId につき1つだけ返してください。
+- メニューごとの animation は独立しています。players の id はそのメニューの animation の中だけで定義・参照してください。
+- 不要な "wait" や、細かすぎる動きを大量に入れないでください。
+${QUALITY_RULES}
+
+${COURT_AND_TYPES}
+
+## 回答形式
+次の形の JSON だけを返してください。Markdown のコードブロックや、前後の説明文は付けないでください。
+animation の中身は、下の例と同じ形にしてください（例の中身はそのまま使わず、各メニューの動きにしてください）。
+
+{
+  "items": [
+    {
+      "menuId": "${menus[0]?.id ?? 'メニューのID'}",
+      "animation": ${example}
+    }
+  ]
+}`
+}
+
+export type BulkItemError = { menuId: string; title?: string; messages: string[] }
+export type BulkParseResult = {
+  // JSON自体が読めないなど、全体が使えない場合の理由
+  fatal?: string
+  ok: { menu: PracticeMenu; animation: MenuAnimation }[]
+  errors: BulkItemError[]
+  // 今回の対象のうち、回答に含まれていなかったメニュー（エラーではない）
+  missing: PracticeMenu[]
+}
+
+// 貼り付けた回答を1件ずつ厳しく確認する。問題のある項目は直さず、エラーとして返す（保存はしない）
+export function parseBulkAnimationAnswer(answer: string, batch: PracticeMenu[], allMenus: PracticeMenu[]): BulkParseResult {
+  const empty = { ok: [], errors: [], missing: [] }
+  let data: unknown
+  try {
+    data = extractJSON(answer)
+  } catch {
+    return { ...empty, fatal: 'Claudeの回答からJSONを読み取れませんでした。JSON形式の回答（{ "items": [ … ] }）をそのまま貼り付けてください。' }
+  }
+  const items = data && typeof data === 'object' ? (data as Record<string, unknown>).items : undefined
+  if (!Array.isArray(items)) {
+    return { ...empty, fatal: '回答に "items"（メニューごとの動きの一覧）が見つかりませんでした。依頼文で指定した形式の回答を貼り付けてください。' }
+  }
+
+  const inBatch = new Map(batch.map((m) => [m.id, m]))
+  const exists = new Map(allMenus.map((m) => [m.id, m]))
+  const ids = items.map((it) => (it && typeof it === 'object' ? (it as Record<string, unknown>).menuId : undefined))
+  const result: BulkParseResult = { ok: [], errors: [], missing: [] }
+  const reported = new Set<string>()
+
+  items.forEach((it, i) => {
+    const id = ids[i]
+    if (typeof id !== 'string' || !id.trim()) {
+      result.errors.push({ menuId: `${i + 1}件目`, messages: ['menuId がありません。'] })
+      return
+    }
+    const menu = exists.get(id)
+    const fail = (messages: string[]) => result.errors.push({ menuId: id, title: menu?.title, messages })
+    // 同じ menuId が2回以上ある場合は、どれも採用しない
+    if (ids.filter((x) => x === id).length > 1) {
+      if (!reported.has(id)) fail(['同じ menuId が2回以上返されています（どちらも保存しません）。'])
+      reported.add(id)
+      return
+    }
+    if (!menu) return fail(['この menuId のメニューは倉庫にありません。'])
+    if (hasAnimation(menu)) return fail(['このメニューにはすでに動きがあります（上書きしません）。'])
+    if (!inBatch.has(id)) return fail(['今回の対象（この20件）に含まれていないメニューです。'])
+    const { animation, errors } = validateAnimation((it as Record<string, unknown>).animation)
+    if (!animation) return fail(errors)
+    result.ok.push({ menu, animation })
+  })
+
+  const answered = new Set(ids.filter((x): x is string => typeof x === 'string'))
+  result.missing = batch.filter((m) => !answered.has(m.id))
+  return result
 }

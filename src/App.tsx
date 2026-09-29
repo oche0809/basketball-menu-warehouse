@@ -14,6 +14,7 @@ import { usePracticeSession } from './utils/session'
 import type { SavedPlan } from './types/menu'
 import { navigate, useHashRoute } from './utils/router'
 import { useMenus } from './utils/storage'
+import { hasAnimation, hasBrokenAnimation } from './utils/animation'
 
 function NotFound() {
   return (
@@ -65,6 +66,19 @@ export default function App() {
         favoritesOnly={page === 'favorites'}
         initialCategory={params.get('category') ?? undefined}
         onAddMenus={page === 'favorites' ? undefined : (inputs) => inputs.forEach(addMenu)}
+        onSaveAnimations={
+          page === 'favorites'
+            ? undefined
+            : (items) => {
+                // 保存直前にもう一度確認：すでに動きがある（内蔵を含む）メニューには保存しない
+                const targets = items.filter(({ id }) => {
+                  const menu = menus.find((m) => m.id === id)
+                  return menu && !hasAnimation(menu) && !hasBrokenAnimation(menu)
+                })
+                targets.forEach(({ id, animation }) => updateMenu(id, { animation }))
+                return targets.length
+              }
+        }
       />
     )
   } else if (page === 'new') {
