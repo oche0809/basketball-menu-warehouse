@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* 印刷（A4縦）。画面は print:hidden で隠し、PrintPlan だけを出す */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+  body {
+    background: #fff;
+  }
+  .print-keep {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
