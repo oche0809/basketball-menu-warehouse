@@ -1,5 +1,1811 @@
 {
   "format": "basketball-menu-warehouse/official-animations",
   "version": 1,
-  "animations": {}
+  "animations": {
+    "lib-001": {
+      "court": "half",
+      "players": [
+        {
+          "id": "P1",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 20,
+            "y": 3
+          }
+        },
+        {
+          "id": "P2",
+          "label": "2",
+          "team": "offense",
+          "start": {
+            "x": 40,
+            "y": 3
+          }
+        },
+        {
+          "id": "P3",
+          "label": "3",
+          "team": "offense",
+          "start": {
+            "x": 60,
+            "y": 3
+          }
+        },
+        {
+          "id": "P4",
+          "label": "4",
+          "team": "offense",
+          "start": {
+            "x": 80,
+            "y": 3
+          }
+        }
+      ],
+      "steps": [
+        {
+          "text": "エンドラインに列で並び、もも上げなどの種目で反対側へ進む。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P1",
+              "to": {
+                "x": 20,
+                "y": 96
+              }
+            },
+            {
+              "type": "move",
+              "player": "P2",
+              "to": {
+                "x": 40,
+                "y": 96
+              }
+            },
+            {
+              "type": "move",
+              "player": "P3",
+              "to": {
+                "x": 60,
+                "y": 96
+              }
+            },
+            {
+              "type": "move",
+              "player": "P4",
+              "to": {
+                "x": 80,
+                "y": 96
+              }
+            }
+          ]
+        },
+        {
+          "text": "帰りは軽いジョグで戻る。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P1",
+              "to": {
+                "x": 20,
+                "y": 4
+              }
+            },
+            {
+              "type": "move",
+              "player": "P2",
+              "to": {
+                "x": 40,
+                "y": 4
+              }
+            },
+            {
+              "type": "move",
+              "player": "P3",
+              "to": {
+                "x": 60,
+                "y": 4
+              }
+            },
+            {
+              "type": "move",
+              "player": "P4",
+              "to": {
+                "x": 80,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "text": "種目を変えて（お尻キック、スキップ、ランジウォーク、サイドステップ、キャリオカ、バックランなど）同じようにくり返す。最後に8割程度のダッシュを1本。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P1",
+              "to": {
+                "x": 20,
+                "y": 96
+              }
+            },
+            {
+              "type": "move",
+              "player": "P2",
+              "to": {
+                "x": 40,
+                "y": 96
+              }
+            },
+            {
+              "type": "move",
+              "player": "P3",
+              "to": {
+                "x": 60,
+                "y": 96
+              }
+            },
+            {
+              "type": "move",
+              "player": "P4",
+              "to": {
+                "x": 80,
+                "y": 96
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "lib-002": {
+      "court": "half",
+      "players": [
+        {
+          "id": "P",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 3
+          }
+        }
+      ],
+      "ball": "P",
+      "steps": [
+        {
+          "text": "ドリブルで進み、フリースローラインで両足同時にジャンプストップ。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "P",
+              "to": {
+                "x": 50,
+                "y": 41
+              }
+            }
+          ]
+        },
+        {
+          "text": "その場でフロントピボット・リバースピボットを各2回。トリプルスレットの姿勢で止まり、顔を上げる。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        },
+        {
+          "text": "センターラインまでドリブルで進み、ジャンプストップ。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "P",
+              "to": {
+                "x": 50,
+                "y": 96
+              }
+            }
+          ]
+        },
+        {
+          "text": "同じようにピボットしてトリプルスレットで止まる。慣れたらワンツーストップでも行う。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        }
+      ]
+    },
+    "lib-003": {
+      "court": "half",
+      "players": [
+        {
+          "id": "P1",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 35,
+            "y": 4
+          }
+        },
+        {
+          "id": "P2",
+          "label": "2",
+          "team": "offense",
+          "start": {
+            "x": 65,
+            "y": 4
+          }
+        }
+      ],
+      "steps": [
+        {
+          "text": "各列の先頭がディフェンスの構えで、低い姿勢のまま合図を待つ。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        },
+        {
+          "text": "コーチの合図（例：「前」）で素早く動き出し、フリースローラインまでダッシュ。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P1",
+              "to": {
+                "x": 35,
+                "y": 41
+              }
+            },
+            {
+              "type": "move",
+              "player": "P2",
+              "to": {
+                "x": 65,
+                "y": 41
+              }
+            }
+          ]
+        },
+        {
+          "text": "合図の種類（右＝サイドステップ、後＝バックラン、手をたたく＝方向転換）やスタート姿勢（寝る・座る）を変えてくり返す。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        }
+      ]
+    },
+    "lib-004": {
+      "court": "half",
+      "players": [
+        {
+          "id": "L",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 48
+          }
+        },
+        {
+          "id": "F",
+          "label": "2",
+          "team": "defense",
+          "start": {
+            "x": 50,
+            "y": 60
+          }
+        }
+      ],
+      "steps": [
+        {
+          "text": "リーダー（1）が横へ動き、もう1人（2）は鏡のようにまねをして付いていく。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "L",
+              "to": {
+                "x": 62,
+                "y": 48
+              }
+            },
+            {
+              "type": "move",
+              "player": "F",
+              "to": {
+                "x": 62,
+                "y": 60
+              }
+            }
+          ]
+        },
+        {
+          "text": "リーダーが反対へ。2は低い姿勢のまま、足をそろえずにサイドステップで付いていく。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "L",
+              "to": {
+                "x": 40,
+                "y": 48
+              }
+            },
+            {
+              "type": "move",
+              "player": "F",
+              "to": {
+                "x": 40,
+                "y": 60
+              }
+            }
+          ]
+        },
+        {
+          "text": "リーダーが前へ出たら、2は下がる。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "L",
+              "to": {
+                "x": 40,
+                "y": 53
+              }
+            },
+            {
+              "type": "move",
+              "player": "F",
+              "to": {
+                "x": 40,
+                "y": 65
+              }
+            }
+          ]
+        },
+        {
+          "text": "20秒で役割を交代し、3セット行う。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        }
+      ]
+    },
+    "lib-005": {
+      "court": "half",
+      "players": [
+        {
+          "id": "P",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 97,
+            "y": 95
+          }
+        }
+      ],
+      "ball": "P",
+      "steps": [
+        {
+          "text": "コートの外周をジョグ。例：頭上でトスしてキャッチしながら走る。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P",
+              "to": {
+                "x": 97,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "text": "コーチの合図で内容を変える。例：腰まわりでボールを回しながら走る。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P",
+              "to": {
+                "x": 50,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "text": "例：ドリブル（右・左・交互）しながら走る。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "P",
+              "to": {
+                "x": 3,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "text": "例：ボールを背中側で持ち替えながら走る。1種目30秒程度。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P",
+              "to": {
+                "x": 3,
+                "y": 95
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "lib-006": {
+      "court": "half",
+      "players": [
+        {
+          "id": "P",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 44
+          }
+        }
+      ],
+      "steps": [
+        {
+          "text": "フリースローラインの前に立ち、両足でラインをまたいで前へ跳ぶ。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P",
+              "to": {
+                "x": 50,
+                "y": 38
+              }
+            }
+          ]
+        },
+        {
+          "text": "後ろへ跳ぶ。前後を10秒間できるだけ速くくり返す（ラインは踏まない）。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P",
+              "to": {
+                "x": 50,
+                "y": 44
+              }
+            }
+          ]
+        },
+        {
+          "text": "10秒休み、種目を変えて（左右ジャンプ、片足ずつ出し入れ、横向きステップ）各2回行う。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        }
+      ]
+    },
+    "lib-007": {
+      "court": "half",
+      "players": [
+        {
+          "id": "P1",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 25,
+            "y": 25
+          }
+        },
+        {
+          "id": "P2",
+          "label": "2",
+          "team": "offense",
+          "start": {
+            "x": 70,
+            "y": 30
+          }
+        },
+        {
+          "id": "P3",
+          "label": "3",
+          "team": "offense",
+          "start": {
+            "x": 35,
+            "y": 70
+          }
+        },
+        {
+          "id": "P4",
+          "label": "4",
+          "team": "offense",
+          "start": {
+            "x": 75,
+            "y": 75
+          }
+        }
+      ],
+      "steps": [
+        {
+          "text": "半面の中だけで、全員がビブスを腰に挟む。合図でスタートし、ほかの人のしっぽを取りにいく。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P1",
+              "to": {
+                "x": 55,
+                "y": 32
+              }
+            },
+            {
+              "type": "move",
+              "player": "P2",
+              "to": {
+                "x": 82,
+                "y": 50
+              }
+            },
+            {
+              "type": "move",
+              "player": "P3",
+              "to": {
+                "x": 20,
+                "y": 55
+              }
+            },
+            {
+              "type": "move",
+              "player": "P4",
+              "to": {
+                "x": 60,
+                "y": 85
+              }
+            }
+          ]
+        },
+        {
+          "text": "自分のしっぽは、低い姿勢で素早く方向転換して守る。顔を上げて周りを見る。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P1",
+              "to": {
+                "x": 74,
+                "y": 44
+              }
+            },
+            {
+              "type": "move",
+              "player": "P2",
+              "to": {
+                "x": 88,
+                "y": 66
+              }
+            },
+            {
+              "type": "move",
+              "player": "P3",
+              "to": {
+                "x": 28,
+                "y": 38
+              }
+            },
+            {
+              "type": "move",
+              "player": "P4",
+              "to": {
+                "x": 45,
+                "y": 70
+              }
+            }
+          ]
+        },
+        {
+          "text": "取られても続け、取った数を競う（1回40秒×3回）。慣れたらドリブルしながら行う。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        }
+      ]
+    },
+    "lib-008": {
+      "court": "half",
+      "players": [
+        {
+          "id": "P",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 20
+          }
+        }
+      ],
+      "steps": [
+        {
+          "text": "① その場で両足ジャンプ。ひざとつま先を同じ向きにして静かに着地し、2秒止まる。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        },
+        {
+          "text": "② 前へ両足ジャンプして、着地で止まる。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P",
+              "to": {
+                "x": 50,
+                "y": 28
+              }
+            }
+          ]
+        },
+        {
+          "text": "③ 片足で前へ跳び、片足で着地して2秒止まる（左右とも）。各5回。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "P",
+              "to": {
+                "x": 50,
+                "y": 35
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "lib-009": {
+      "court": "half",
+      "players": [
+        {
+          "id": "P",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 3
+          }
+        }
+      ],
+      "ball": "P",
+      "steps": [
+        {
+          "text": "体を起こしてゆっくりドリブル。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "P",
+              "to": {
+                "x": 50,
+                "y": 22
+              }
+            }
+          ]
+        },
+        {
+          "text": "コーチの笛で、低く大きな一歩目から一気に加速（3〜4歩）。ボールを前に押し出す。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "P",
+              "to": {
+                "x": 50,
+                "y": 46
+              }
+            }
+          ]
+        },
+        {
+          "text": "再びゆっくりのドリブルに戻す。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "P",
+              "to": {
+                "x": 50,
+                "y": 58
+              }
+            }
+          ]
+        },
+        {
+          "text": "笛で再び加速。これを繰り返して反対側まで進み、帰りは逆の手で行う。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "P",
+              "to": {
+                "x": 50,
+                "y": 90
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "sample-1": {
+      "court": "half",
+      "players": [
+        {
+          "id": "P",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 40,
+            "y": 3
+          }
+        }
+      ],
+      "ball": "P",
+      "steps": [
+        {
+          "text": "エンドラインからフリースローラインまで、顔を上げてドリブルで進む。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "P",
+              "to": {
+                "x": 40,
+                "y": 41
+              }
+            }
+          ]
+        },
+        {
+          "text": "姿勢を低くして止まり、エンドラインまでドリブルで戻る。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "P",
+              "to": {
+                "x": 40,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "text": "次はセンターラインまでドリブルで進む。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "P",
+              "to": {
+                "x": 40,
+                "y": 97
+              }
+            }
+          ]
+        },
+        {
+          "text": "エンドラインまで戻る。右手・左手・フロントチェンジなど、種類を変えて笛の合図でくり返す。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "P",
+              "to": {
+                "x": 40,
+                "y": 4
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "sample-10": {
+      "court": "half",
+      "players": [
+        {
+          "id": "L",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 15,
+            "y": 97
+          }
+        },
+        {
+          "id": "M",
+          "label": "2",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 97
+          }
+        },
+        {
+          "id": "R",
+          "label": "3",
+          "team": "offense",
+          "start": {
+            "x": 85,
+            "y": 97
+          }
+        }
+      ],
+      "ball": "M",
+      "steps": [
+        {
+          "text": "3列（左・中央・右）で走り出す。中央の2番が右の3番へ、走る前にパスを出し、3番の後ろを回って走る。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "R",
+              "to": {
+                "x": 60,
+                "y": 80
+              }
+            },
+            {
+              "type": "cut",
+              "player": "M",
+              "to": {
+                "x": 82,
+                "y": 78
+              }
+            },
+            {
+              "type": "move",
+              "player": "L",
+              "to": {
+                "x": 16,
+                "y": 80
+              }
+            },
+            {
+              "type": "pass",
+              "from": "M",
+              "to": "R"
+            }
+          ]
+        },
+        {
+          "text": "3番は左の1番へパスし、1番の後ろを回って走る（8の字）。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "L",
+              "to": {
+                "x": 40,
+                "y": 60
+              }
+            },
+            {
+              "type": "cut",
+              "player": "R",
+              "to": {
+                "x": 18,
+                "y": 58
+              }
+            },
+            {
+              "type": "move",
+              "player": "M",
+              "to": {
+                "x": 84,
+                "y": 60
+              }
+            },
+            {
+              "type": "pass",
+              "from": "R",
+              "to": "L"
+            }
+          ]
+        },
+        {
+          "text": "1番は右から走ってきた2番へパスし、2番の後ろを回って走る。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "M",
+              "to": {
+                "x": 64,
+                "y": 40
+              }
+            },
+            {
+              "type": "cut",
+              "player": "L",
+              "to": {
+                "x": 84,
+                "y": 42
+              }
+            },
+            {
+              "type": "move",
+              "player": "R",
+              "to": {
+                "x": 20,
+                "y": 40
+              }
+            },
+            {
+              "type": "pass",
+              "from": "L",
+              "to": "M"
+            }
+          ]
+        },
+        {
+          "text": "ボールを受けた2番がゴールへ向かいレイアップ。帰りも同じように行う。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "M",
+              "to": {
+                "x": 56,
+                "y": 20
+              }
+            },
+            {
+              "type": "shoot",
+              "player": "M"
+            }
+          ]
+        }
+      ]
+    },
+    "sample-11": {
+      "court": "half",
+      "players": [
+        {
+          "id": "A1",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 64
+          }
+        },
+        {
+          "id": "A2",
+          "label": "2",
+          "team": "offense",
+          "start": {
+            "x": 82,
+            "y": 45
+          }
+        },
+        {
+          "id": "A3",
+          "label": "3",
+          "team": "offense",
+          "start": {
+            "x": 18,
+            "y": 45
+          }
+        },
+        {
+          "id": "B1",
+          "label": "1",
+          "team": "defense",
+          "start": {
+            "x": 50,
+            "y": 55
+          }
+        },
+        {
+          "id": "B2",
+          "label": "2",
+          "team": "defense",
+          "start": {
+            "x": 74,
+            "y": 40
+          }
+        },
+        {
+          "id": "B3",
+          "label": "3",
+          "team": "defense",
+          "start": {
+            "x": 26,
+            "y": 40
+          }
+        }
+      ],
+      "ball": "A1",
+      "steps": [
+        {
+          "text": "Aチーム（攻撃）対Bチーム（守備）で3on3。Cチームは反対側のコートで待つ。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        },
+        {
+          "text": "Aチームがシュート（図は1番がシュートした例）。",
+          "actions": [
+            {
+              "type": "shoot",
+              "player": "A1"
+            }
+          ]
+        },
+        {
+          "text": "Bチームがボールを取る。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "B1",
+              "to": {
+                "x": 52,
+                "y": 22
+              }
+            },
+            {
+              "type": "rebound",
+              "player": "B1"
+            }
+          ]
+        },
+        {
+          "text": "攻守が切り替わり、Bチームがそのまま反対側へ攻めてCチームと3on3。得点したチームにポイント。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "B1",
+              "to": {
+                "x": 50,
+                "y": 95
+              }
+            },
+            {
+              "type": "move",
+              "player": "B2",
+              "to": {
+                "x": 82,
+                "y": 93
+              }
+            },
+            {
+              "type": "move",
+              "player": "B3",
+              "to": {
+                "x": 18,
+                "y": 93
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "sample-13": {
+      "court": "half",
+      "players": [
+        {
+          "id": "S",
+          "label": "S",
+          "team": "offense",
+          "start": {
+            "x": 90,
+            "y": 14
+          }
+        },
+        {
+          "id": "R",
+          "label": "R",
+          "team": "neutral",
+          "start": {
+            "x": 50,
+            "y": 22
+          }
+        }
+      ],
+      "ball": "R",
+      "steps": [
+        {
+          "text": "リバウンダー（R）がシューター（S）へパス。1か所目で打つ。",
+          "actions": [
+            {
+              "type": "pass",
+              "from": "R",
+              "to": "S"
+            }
+          ]
+        },
+        {
+          "text": "シューターは同じリズムでシュート。",
+          "actions": [
+            {
+              "type": "shoot",
+              "player": "S"
+            }
+          ]
+        },
+        {
+          "text": "Rはリバウンドを取り、Sは次の場所へ移動する。",
+          "actions": [
+            {
+              "type": "rebound",
+              "player": "R"
+            },
+            {
+              "type": "move",
+              "player": "S",
+              "to": {
+                "x": 82,
+                "y": 45
+              }
+            }
+          ]
+        },
+        {
+          "text": "Rはすぐにパスを返し、Sがシュート。",
+          "actions": [
+            {
+              "type": "pass",
+              "from": "R",
+              "to": "S"
+            },
+            {
+              "type": "shoot",
+              "player": "S"
+            }
+          ]
+        },
+        {
+          "text": "5か所をローテーションしながら3分間続け、決めた本数を記録する。",
+          "actions": [
+            {
+              "type": "rebound",
+              "player": "R"
+            },
+            {
+              "type": "move",
+              "player": "S",
+              "to": {
+                "x": 50,
+                "y": 64
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "sample-14": {
+      "court": "half",
+      "players": [
+        {
+          "id": "D",
+          "label": "1",
+          "team": "defense",
+          "start": {
+            "x": 4,
+            "y": 60
+          }
+        }
+      ],
+      "steps": [
+        {
+          "text": "サイドラインから、低い姿勢のままスライドステップで横へ移動する。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "D",
+              "to": {
+                "x": 48,
+                "y": 60
+              }
+            }
+          ]
+        },
+        {
+          "text": "コーチの合図でドロップステップし、方向を変える。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "D",
+              "to": {
+                "x": 42,
+                "y": 66
+              }
+            }
+          ]
+        },
+        {
+          "text": "合図でクロスステップのダッシュを入れ、反対のサイドラインまで進む。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "D",
+              "to": {
+                "x": 96,
+                "y": 66
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "sample-15": {
+      "court": "half",
+      "players": [
+        {
+          "id": "O1",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 64
+          }
+        },
+        {
+          "id": "O2",
+          "label": "2",
+          "team": "offense",
+          "start": {
+            "x": 82,
+            "y": 45
+          }
+        },
+        {
+          "id": "O3",
+          "label": "3",
+          "team": "offense",
+          "start": {
+            "x": 18,
+            "y": 45
+          }
+        },
+        {
+          "id": "O4",
+          "label": "4",
+          "team": "offense",
+          "start": {
+            "x": 66,
+            "y": 22
+          }
+        },
+        {
+          "id": "O5",
+          "label": "5",
+          "team": "offense",
+          "start": {
+            "x": 34,
+            "y": 22
+          }
+        },
+        {
+          "id": "D1",
+          "label": "1",
+          "team": "defense",
+          "start": {
+            "x": 50,
+            "y": 56
+          }
+        },
+        {
+          "id": "D2",
+          "label": "2",
+          "team": "defense",
+          "start": {
+            "x": 75,
+            "y": 40
+          }
+        },
+        {
+          "id": "D3",
+          "label": "3",
+          "team": "defense",
+          "start": {
+            "x": 25,
+            "y": 40
+          }
+        },
+        {
+          "id": "D4",
+          "label": "4",
+          "team": "defense",
+          "start": {
+            "x": 60,
+            "y": 18
+          }
+        },
+        {
+          "id": "D5",
+          "label": "5",
+          "team": "defense",
+          "start": {
+            "x": 40,
+            "y": 18
+          }
+        }
+      ],
+      "ball": "O1",
+      "steps": [
+        {
+          "text": "5on5で、決めた条件のもとで攻める（図は「パス3本以上で得点2倍」の例）。",
+          "actions": [
+            {
+              "type": "pass",
+              "from": "O1",
+              "to": "O2"
+            }
+          ]
+        },
+        {
+          "text": "パス2本目。",
+          "actions": [
+            {
+              "type": "pass",
+              "from": "O2",
+              "to": "O1"
+            }
+          ]
+        },
+        {
+          "text": "パス3本目。",
+          "actions": [
+            {
+              "type": "pass",
+              "from": "O1",
+              "to": "O3"
+            }
+          ]
+        },
+        {
+          "text": "条件を満たしてシュート。5分×3本行い、1本ごとに条件を振り返る。",
+          "actions": [
+            {
+              "type": "shoot",
+              "player": "O3"
+            }
+          ]
+        }
+      ]
+    },
+    "sample-2": {
+      "court": "half",
+      "players": [
+        {
+          "id": "P",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 55
+          }
+        }
+      ],
+      "ball": "P",
+      "steps": [
+        {
+          "text": "① 頭・腰・足首のまわりでボールを回す（30秒）。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        },
+        {
+          "text": "② 足の間で8の字にボールを回す（30秒）。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        },
+        {
+          "text": "③ 両足の間で、前後に持ち替えてキャッチする（30秒）。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        },
+        {
+          "text": "④ その場で低いドリブル（左右）。⑤ ドリブルで8の字（各30秒）。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        }
+      ]
+    },
+    "sample-3": {
+      "court": "half",
+      "players": [
+        {
+          "id": "A",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 62
+          }
+        },
+        {
+          "id": "B",
+          "label": "2",
+          "team": "offense",
+          "start": {
+            "x": 72,
+            "y": 36
+          }
+        },
+        {
+          "id": "C",
+          "label": "3",
+          "team": "offense",
+          "start": {
+            "x": 28,
+            "y": 36
+          }
+        }
+      ],
+      "ball": "A",
+      "steps": [
+        {
+          "text": "1番が2番へパスし、パスを出した2番の位置へ走る。",
+          "actions": [
+            {
+              "type": "pass",
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "type": "move",
+              "player": "A",
+              "to": {
+                "x": 66,
+                "y": 42
+              }
+            }
+          ]
+        },
+        {
+          "text": "2番が3番へパスし、3番の位置へ走る。",
+          "actions": [
+            {
+              "type": "pass",
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "type": "move",
+              "player": "B",
+              "to": {
+                "x": 34,
+                "y": 42
+              }
+            }
+          ]
+        },
+        {
+          "text": "3番が1番へパスし、1番の位置へ走る。これを続け、1分ごとに回る向きを変える。",
+          "actions": [
+            {
+              "type": "pass",
+              "from": "C",
+              "to": "A"
+            },
+            {
+              "type": "move",
+              "player": "C",
+              "to": {
+                "x": 72,
+                "y": 34
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "sample-4": {
+      "court": "half",
+      "players": [
+        {
+          "id": "A",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 40
+          }
+        },
+        {
+          "id": "B",
+          "label": "2",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 64
+          }
+        }
+      ],
+      "ball": "A",
+      "steps": [
+        {
+          "text": "1番が一歩踏み込み、胸の前から2番の胸へまっすぐチェストパス。",
+          "actions": [
+            {
+              "type": "pass",
+              "from": "A",
+              "to": "B"
+            }
+          ]
+        },
+        {
+          "text": "2番も同じように1番へチェストパスを返す。",
+          "actions": [
+            {
+              "type": "pass",
+              "from": "B",
+              "to": "A"
+            }
+          ]
+        },
+        {
+          "text": "20本できたら、2番が下がって距離を1m広げる。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "B",
+              "to": {
+                "x": 50,
+                "y": 71
+              }
+            }
+          ]
+        },
+        {
+          "text": "広げた距離でチェストパスを続ける。",
+          "actions": [
+            {
+              "type": "pass",
+              "from": "A",
+              "to": "B"
+            }
+          ]
+        }
+      ]
+    },
+    "sample-7": {
+      "court": "half",
+      "players": [
+        {
+          "id": "O",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 50,
+            "y": 64
+          }
+        },
+        {
+          "id": "D",
+          "label": "1",
+          "team": "defense",
+          "start": {
+            "x": 50,
+            "y": 55
+          }
+        }
+      ],
+      "ball": "O",
+      "steps": [
+        {
+          "text": "トップでパスを受けたところから1on1。オフェンスはトリプルスレット、ディフェンスはボールとゴールの間に立つ。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        },
+        {
+          "text": "オフェンスはドリブルでゴールへ攻め、ディフェンスは足を動かしてついていく。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "O",
+              "to": {
+                "x": 58,
+                "y": 24
+              }
+            },
+            {
+              "type": "move",
+              "player": "D",
+              "to": {
+                "x": 55,
+                "y": 29
+              }
+            }
+          ]
+        },
+        {
+          "text": "オフェンスがシュート。得点したらオフェンス継続（最大3回）、止めたら攻守交代。",
+          "actions": [
+            {
+              "type": "shoot",
+              "player": "O"
+            }
+          ]
+        }
+      ]
+    },
+    "sample-9": {
+      "court": "half",
+      "players": [
+        {
+          "id": "C",
+          "label": "C",
+          "team": "neutral",
+          "start": {
+            "x": 50,
+            "y": 75
+          }
+        },
+        {
+          "id": "A1",
+          "label": "1",
+          "team": "offense",
+          "start": {
+            "x": 12,
+            "y": 3
+          }
+        },
+        {
+          "id": "A2",
+          "label": "2",
+          "team": "offense",
+          "start": {
+            "x": 22,
+            "y": 3
+          }
+        },
+        {
+          "id": "A3",
+          "label": "3",
+          "team": "offense",
+          "start": {
+            "x": 32,
+            "y": 3
+          }
+        },
+        {
+          "id": "B1",
+          "label": "1",
+          "team": "defense",
+          "start": {
+            "x": 68,
+            "y": 3
+          }
+        },
+        {
+          "id": "B2",
+          "label": "2",
+          "team": "defense",
+          "start": {
+            "x": 78,
+            "y": 3
+          }
+        },
+        {
+          "id": "B3",
+          "label": "3",
+          "team": "defense",
+          "start": {
+            "x": 88,
+            "y": 3
+          }
+        }
+      ],
+      "ball": "C",
+      "steps": [
+        {
+          "text": "両チームがエンドラインに並ぶ。コーチが番号を3つ呼ぶ。",
+          "actions": [
+            {
+              "type": "wait"
+            }
+          ]
+        },
+        {
+          "text": "呼ばれた選手がコートへ出る。コーチがボールをコートに転がし、先に取った選手のチームが攻める（図は白チームが取った例）。",
+          "actions": [
+            {
+              "type": "move",
+              "player": "A1",
+              "to": {
+                "x": 38,
+                "y": 58
+              }
+            },
+            {
+              "type": "move",
+              "player": "A2",
+              "to": {
+                "x": 18,
+                "y": 45
+              }
+            },
+            {
+              "type": "move",
+              "player": "A3",
+              "to": {
+                "x": 82,
+                "y": 45
+              }
+            },
+            {
+              "type": "move",
+              "player": "B1",
+              "to": {
+                "x": 44,
+                "y": 40
+              }
+            },
+            {
+              "type": "move",
+              "player": "B2",
+              "to": {
+                "x": 26,
+                "y": 36
+              }
+            },
+            {
+              "type": "move",
+              "player": "B3",
+              "to": {
+                "x": 74,
+                "y": 36
+              }
+            },
+            {
+              "type": "pass",
+              "from": "C",
+              "to": "A1"
+            }
+          ]
+        },
+        {
+          "text": "ボールを取ったチームはそのまま3on3。相手チームはまず人数をそろえ、声でマークを決めて守る。",
+          "actions": [
+            {
+              "type": "dribble",
+              "player": "A1",
+              "to": {
+                "x": 46,
+                "y": 24
+              }
+            },
+            {
+              "type": "move",
+              "player": "B1",
+              "to": {
+                "x": 48,
+                "y": 28
+              }
+            }
+          ]
+        },
+        {
+          "text": "得点するか、守りきったら終了。",
+          "actions": [
+            {
+              "type": "shoot",
+              "player": "A1"
+            }
+          ]
+        }
+      ]
+    }
+  }
 }
