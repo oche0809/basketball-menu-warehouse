@@ -3,6 +3,7 @@ import { BUILTIN_ANIMATIONS } from '../data/menuAnimations'
 import officialData from '../data/officialAnimations.json'
 import { createLibraryMenus } from '../data/libraryMenus'
 import { createLibraryMenus2 } from '../data/libraryMenus2'
+import { createLibraryMenus3 } from '../data/libraryMenus3'
 import { createSampleMenus } from '../data/sampleMenus'
 import type { MenuAnimation } from '../types/menu'
 import { OFFICIAL_ANIMATIONS, validateAnimation } from './animation'
@@ -13,7 +14,7 @@ export const OFFICIAL_FORMAT = 'basketball-menu-warehouse/official-animations'
 export const OFFICIAL_FILE_NAME = 'officialAnimations.json'
 
 // 公式メニュー（アプリに入っているメニュー）のID。先生が自分で追加したメニューは、ほかの人の倉庫にはないので公式にできない
-export const OFFICIAL_MENU_IDS = new Set([...createSampleMenus(), ...createLibraryMenus(), ...createLibraryMenus2()].map((m) => m.id))
+export const OFFICIAL_MENU_IDS = new Set([...createSampleMenus(), ...createLibraryMenus(), ...createLibraryMenus2(), ...createLibraryMenus3()].map((m) => m.id))
 
 // 公式として採用できるか：公式メニューで、公式・アプリ内蔵の動きがまだないこと（内蔵の8件は置き換えない）
 export function officialAdoptError(id: string): string | null {
