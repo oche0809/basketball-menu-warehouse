@@ -13,7 +13,7 @@ const isStr = (v: unknown): v is string => typeof v === 'string' && v.trim() !==
 const asObj = (v: unknown) => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : null)
 const show = (v: unknown) => (typeof v === 'string' ? `「${v}」` : JSON.stringify(v) ?? String(v))
 
-// 外から来たデータ（Claudeの回答・バックアップ）を厳しく確認する。
+// 外から来たデータ（AIの回答・バックアップ）を厳しく確認する。
 // 1つでも問題があれば animation は null とし、問題点をすべて日本語で返す（勝手に直したり捨てたりしない）
 export function validateAnimation(v: unknown): { animation: MenuAnimation | null; errors: string[] } {
   const errors: string[] = []

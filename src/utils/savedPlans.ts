@@ -117,11 +117,15 @@ export function useSavedPlans() {
 
   const replaceSaved = (list: SavedPlan[]) => setSavedPlans(list)
 
+  // 共有用テキストから取り込んだ計画を保存済みに追加する
+  const importSaved = (saved: SavedPlan) => setSavedPlans((prev) => [...prev, saved])
+
   return {
     savedPlans: [...savedPlans].sort((a, b) => b.savedAt.localeCompare(a.savedAt)),
     savePlan,
     deleteSaved,
     toggleSavedFavorite,
     replaceSaved,
+    importSaved,
   }
 }

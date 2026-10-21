@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { ConfirmDialog } from '../components/ConfirmDialog'
+import { ImportSharedDialog } from '../components/ImportSharedDialog'
 import { PrintPlan } from '../components/PrintPlan'
+import { ShareButton } from '../components/ShareButton'
 import type { PracticeMenu, SavedPlan } from '../types/menu'
 import { ALL } from '../utils/filters'
 import { PLAN_TARGETS } from '../utils/plan'
 import { EMPTY_SAVED_FILTER, SAVED_COUNT_RANGES, SAVED_DURATION_RANGES, filterSavedPlans, planTotal, type SavedFilter } from '../utils/savedPlans'
+import { buildShareText } from '../utils/sharePlan'
 import { TimeSummary, formatDate, printPage } from './PlanPage'
 
 const formatSavedAt = (iso: string) => {
@@ -43,10 +46,12 @@ type ListProps = {
   hasCurrentPlan: boolean
   onUse: (plan: SavedPlan) => void
   onToggleFavorite: (id: string) => void
+  onImport: (saved: SavedPlan) => void
 }
 
-export function SavedPlansList({ plans, menus, hasCurrentPlan, onUse, onToggleFavorite }: ListProps) {
+export function SavedPlansList({ plans, menus, hasCurrentPlan, onUse, onToggleFavorite, onImport }: ListProps) {
   const [filter, setFilter] = useState<SavedFilter>(EMPTY_SAVED_FILTER)
+  const [importing, setImporting] = useState(false)
   const [using, setUsing] = useState<SavedPlan | null>(null)
   const results = filterSavedPlans(plans, menus, filter)
   const active = JSON.stringify(filter) !== JSON.stringify(EMPTY_SAVED_FILTER)
@@ -66,6 +71,23 @@ export function SavedPlansList({ plans, menus, hasCurrentPlan, onUse, onToggleFa
           練習計画へ →
         </a>
       </div>
+      <button
+        type="button"
+        onClick={() => setImporting(true)}
+        className="w-full rounded-lg border border-orange-300 bg-orange-50 px-4 py-3 font-bold text-orange-800 hover:bg-orange-100 sm:w-auto"
+      >
+        📥 共有された計画を取り込む
+      </button>
+      {importing && (
+        <ImportSharedDialog
+          menus={menus}
+          onClose={() => setImporting(false)}
+          onImport={(saved) => {
+            setImporting(false)
+            onImport(saved)
+          }}
+        />
+      )}
 
       {plans.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-10 text-center text-slate-500">
@@ -218,13 +240,16 @@ export function SavedPlanDetail({ plan, menus, hasCurrentPlan, onUse, onDelete, 
           <a href="#/saved" className="inline-block py-2 font-medium text-orange-700 hover:underline">
             ← 保存済み一覧へ
           </a>
-          <button
-            type="button"
-            onClick={printPage}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold whitespace-nowrap text-slate-700 hover:bg-slate-50"
-          >
-            🖨️ 印刷
-          </button>
+          <div className="flex items-center gap-2">
+            <ShareButton getText={() => buildShareText(plan, menus)} />
+            <button
+              type="button"
+              onClick={printPage}
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold whitespace-nowrap text-slate-700 hover:bg-slate-50"
+            >
+              🖨️ 印刷
+            </button>
+          </div>
         </div>
 
         <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 md:p-5">

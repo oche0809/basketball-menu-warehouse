@@ -24,7 +24,7 @@ type Props = {
 
 const ALL = 'すべて'
 
-// 動きがないメニューを20件ずつClaudeに依頼し、回答をまとめて確認して、公式として採用（またはこのブラウザに保存）する。
+// 動きがないメニューを20件ずつAIに依頼し、回答をまとめて確認して、公式として採用（またはこのブラウザに保存）する。
 // アプリからAIサービスへは一切アクセスしない。ボタンを押して確定するまでメニューは変更しない。すでに動きがあるメニューは対象にしない
 export function BulkAnimationPanel({ menus, draftIds, onSave, onAdopt }: Props) {
   const [category, setCategory] = useState(ALL)
@@ -130,7 +130,7 @@ export function BulkAnimationPanel({ menus, draftIds, onSave, onAdopt }: Props) 
         <div className="space-y-3">
           <p className="text-sm leading-relaxed text-slate-600">
             動きがまだないメニューを{BULK_BATCH_SIZE}
-            件ずつ取り出し、Claudeへの依頼文を作ります。Claudeが返したJSONを貼り付けてチェックし、プレビューと品質を確認してから、公式として採用します。すでに動きがあるメニューは変更しません。
+            件ずつ取り出し、AIへの依頼文を作ります。AIが返したJSONを貼り付けてチェックし、プレビューと品質を確認してから、公式として採用します。すでに動きがあるメニューは変更しません。
           </p>
           <div className="grid grid-cols-2 gap-2 sm:max-w-md">
             <label className="space-y-1 text-sm font-bold text-slate-700">
@@ -219,12 +219,12 @@ export function BulkAnimationPanel({ menus, draftIds, onSave, onAdopt }: Props) 
             </div>
           ) : (
             <>
-              <section aria-label="Claudeに渡すプロンプト" className="space-y-2">
-                <p className="font-bold">Claudeに渡すプロンプト</p>
+              <section aria-label="AIに渡すプロンプト" className="space-y-2">
+                <p className="font-bold">AIに渡すプロンプト</p>
                 <ol className="list-decimal space-y-0.5 rounded-lg bg-violet-50 py-2 pr-3 pl-8 text-sm text-violet-900">
-                  <li>「📋 Claude用プロンプトをコピー」を押します。</li>
-                  <li>Claude（アプリまたは claude.ai）に貼り付けて送信します。</li>
-                  <li>Claudeが返したJSONを下の欄に貼り付け、「JSONをチェック」を押します。</li>
+                  <li>「📋 AI用プロンプトをコピー」を押します。</li>
+                  <li>Gemini や Claude などのAIに貼り付けて送信します。</li>
+                  <li>AIが返したJSONを下の欄に貼り付け、「JSONをチェック」を押します。</li>
                 </ol>
                 <textarea
                   ref={promptRef}
@@ -232,12 +232,12 @@ export function BulkAnimationPanel({ menus, draftIds, onSave, onAdopt }: Props) 
                   readOnly
                   rows={6}
                   onFocus={(e) => e.currentTarget.select()}
-                  aria-label="Claude用プロンプト"
+                  aria-label="AI用プロンプト"
                   className="block w-full resize-y rounded-lg border border-slate-300 bg-stone-50 p-3 font-mono text-sm leading-relaxed"
                 />
                 <div className="flex flex-wrap items-center gap-3">
                   <button type="button" onClick={copyPrompt} className="w-full rounded-lg bg-violet-600 px-4 py-3 font-bold text-white hover:bg-violet-700 sm:w-auto">
-                    📋 Claude用プロンプトをコピー
+                    📋 AI用プロンプトをコピー
                   </button>
                   <p aria-live="polite" className="text-sm font-bold">
                     {copyStatus === 'copied' && <span className="text-emerald-700">✓ コピーしました</span>}
@@ -246,14 +246,14 @@ export function BulkAnimationPanel({ menus, draftIds, onSave, onAdopt }: Props) 
                 </div>
               </section>
 
-              <section aria-label="ClaudeからのJSON" className="space-y-2 border-t border-slate-200 pt-4">
+              <section aria-label="AIからのJSON" className="space-y-2 border-t border-slate-200 pt-4">
                 <label className="block space-y-1">
-                  <span className="font-bold">Claudeから返ってきたJSONを貼り付けてください</span>
+                  <span className="font-bold">AIから返ってきたJSONを貼り付けてください</span>
                   <textarea
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}
                     rows={6}
-                    placeholder='Claudeの回答（{ "items": [ … ] } で始まるJSON）をここに貼り付け'
+                    placeholder='AIの回答（{ "items": [ … ] } で始まるJSON）をここに貼り付け'
                     className={`${fieldClass} resize-y font-mono text-sm ${result?.fatal ? 'border-rose-500' : ''}`}
                   />
                 </label>
@@ -287,7 +287,7 @@ export function BulkAnimationPanel({ menus, draftIds, onSave, onAdopt }: Props) 
 
                       {result.errors.length > 0 && (
                         <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
-                          <p className="font-bold">❌ エラー（保存できません。直す場合はClaudeに問題点を伝えて作り直してもらってください）</p>
+                          <p className="font-bold">❌ エラー（保存できません。直す場合はAIに問題点を伝えて作り直してもらってください）</p>
                           <ul className="mt-1 list-disc space-y-1 pl-5 break-words">
                             {result.errors.map((e, i) => (
                               <li key={i}>
@@ -303,7 +303,7 @@ export function BulkAnimationPanel({ menus, draftIds, onSave, onAdopt }: Props) 
                         </div>
                       )}
                       {result.missing.length > 0 && (
-                        <p className="text-sm text-slate-500">回答なし（Claudeが作らなかったメニュー）：{result.missing.map((m) => m.id).join('、')}。次に抽出したときも未設定として残ります。</p>
+                        <p className="text-sm text-slate-500">回答なし（AIが作らなかったメニュー）：{result.missing.map((m) => m.id).join('、')}。次に抽出したときも未設定として残ります。</p>
                       )}
 
                       {result.ok.length > 0 && (

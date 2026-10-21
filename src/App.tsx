@@ -30,7 +30,7 @@ export default function App() {
   const { menus, addMenu, updateMenu, deleteMenu, toggleFavorite, replaceMenus } = useMenus()
   const { replacePlan, ...planActions } = usePracticePlan(menus)
   const session = usePracticeSession(planActions.items)
-  const { savedPlans, savePlan, deleteSaved, toggleSavedFavorite, replaceSaved } = useSavedPlans()
+  const { savedPlans, savePlan, deleteSaved, toggleSavedFavorite, replaceSaved, importSaved } = useSavedPlans()
 
   // 保存済み計画を現在の計画へコピーして、練習計画画面で確認・編集できるようにする
   const applySavedPlan = (saved: SavedPlan) => {
@@ -129,6 +129,10 @@ export default function App() {
         hasCurrentPlan={planActions.items.length > 0}
         onUse={applySavedPlan}
         onToggleFavorite={toggleSavedFavorite}
+        onImport={(shared) => {
+          importSaved(shared)
+          navigate(`/saved/${shared.id}`)
+        }}
       />
     ) : saved ? (
       <SavedPlanDetail

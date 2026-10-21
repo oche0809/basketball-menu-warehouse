@@ -75,7 +75,7 @@ const ANSWER_FORMAT = `## 回答形式
   "animation": ${EXAMPLE_ANIMATION}
 }`
 
-// メニューの「動き」を作ってもらうための依頼文（Claudeに手動で貼り付ける。アプリからは通信しない）
+// メニューの「動き」を作ってもらうための依頼文（AIに手動で貼り付ける。アプリからは通信しない）
 export function buildAnimationPrompt(menu: PracticeMenu): string {
   return `${INTRO}
 次の練習メニューの「動き」を、ハーフコート上の選手とボールの動きとして JSON で表してください。
@@ -124,7 +124,7 @@ export function parseAnimationAnswer(answer: string): { animation: MenuAnimation
   try {
     data = extractJSON(answer)
   } catch {
-    return { animation: null, errors: ['Claudeの回答からJSONを読み取れませんでした。JSON形式の回答（{ "animation": … }）をそのまま貼り付けてください。'] }
+    return { animation: null, errors: ['AIの回答からJSONを読み取れませんでした。JSON形式の回答（{ "animation": … }）をそのまま貼り付けてください。'] }
   }
   const o = data && typeof data === 'object' ? (data as Record<string, unknown>) : null
   if (!o || !('animation' in o)) {
@@ -147,7 +147,7 @@ ${menuLines(menu)}- 必要な道具：${menu.equipment.join('、') || 'なし'}
 - タグ：${menu.tags.join('、') || 'なし'}`
 }
 
-// 動きがまだないメニューをまとめて依頼する文（Claudeに手動で貼り付ける。アプリからは通信しない）
+// 動きがまだないメニューをまとめて依頼する文（AIに手動で貼り付ける。アプリからは通信しない）
 export function buildBulkAnimationPrompt(menus: PracticeMenu[]): string {
   const example = EXAMPLE_ANIMATION.replace(/\n/g, '\n    ')
   return `${INTRO}
@@ -199,7 +199,7 @@ export function parseBulkAnimationAnswer(answer: string, batch: PracticeMenu[], 
   try {
     data = extractJSON(answer)
   } catch {
-    return { ...empty, fatal: 'Claudeの回答からJSONを読み取れませんでした。JSON形式の回答（{ "items": [ … ] }）をそのまま貼り付けてください。' }
+    return { ...empty, fatal: 'AIの回答からJSONを読み取れませんでした。JSON形式の回答（{ "items": [ … ] }）をそのまま貼り付けてください。' }
   }
   const items = data && typeof data === 'object' ? (data as Record<string, unknown>).items : undefined
   if (!Array.isArray(items)) {

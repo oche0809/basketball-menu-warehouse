@@ -116,7 +116,7 @@ const TEAM_STYLE = {
   neutral: { fill: '#64748b', stroke: '#ffffff', text: '#ffffff' },
 }
 
-// label・footer はプレビューとして使うとき用（Phase 11：Claudeが作った動きの確認）
+// label・footer はプレビューとして使うとき用（Phase 11：AIが作った動きの確認）
 type Props = {
   title: string
   animation: MenuAnimation

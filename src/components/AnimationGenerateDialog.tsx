@@ -13,7 +13,7 @@ type Props = {
   onClose: () => void
 }
 
-// メニュー →（修正のときは修正内容の入力 →）Claudeへの依頼文 → 回答の貼り付けと確認 → プレビュー → 保存。
+// メニュー →（修正のときは修正内容の入力 →）AIへの依頼文 → 回答の貼り付けと確認 → プレビュー → 保存。
 // アプリからAIサービスへは一切アクセスしない。「保存する」を確定するまでメニュー（今の動き）は変更しない
 export function AnimationGenerateDialog({ menu, current, onSave, onClose }: Props) {
   const revising = !!current
@@ -50,7 +50,7 @@ export function AnimationGenerateDialog({ menu, current, onSave, onClose }: Prop
         setPreviewKey((k) => k + 1)
       }
     } catch (e) {
-      setErrors([e instanceof Error ? e.message : 'Claudeの回答を読み取れませんでした。'])
+      setErrors([e instanceof Error ? e.message : 'AIの回答を読み取れませんでした。'])
     }
   }
 
@@ -128,9 +128,9 @@ export function AnimationGenerateDialog({ menu, current, onSave, onClose }: Prop
           ) : (
             <>
               <ol className="list-decimal space-y-0.5 rounded-lg bg-violet-50 py-2 pr-3 pl-8 text-sm text-violet-900">
-                <li>「📋 Claudeへの依頼文をコピー」を押します。</li>
-                <li>Claude（アプリまたは claude.ai）に貼り付けて送信します。</li>
-                <li>Claudeの回答を下の欄に貼り付け、「回答を解析する」を押します。</li>
+                <li>「📋 AIへの依頼文をコピー」を押します。</li>
+                <li>Gemini や Claude などのAIに貼り付けて送信します。</li>
+                <li>AIの回答を下の欄に貼り付け、「回答を解析する」を押します。</li>
                 <li>プレビューで動きを確認し、よければ「✓ この動きを保存」を押します。</li>
               </ol>
               <textarea
@@ -139,7 +139,7 @@ export function AnimationGenerateDialog({ menu, current, onSave, onClose }: Prop
                 readOnly
                 rows={6}
                 onFocus={(e) => e.currentTarget.select()}
-                aria-label="Claudeへの依頼文"
+                aria-label="AIへの依頼文"
                 className="block w-full resize-y rounded-lg border border-slate-300 bg-stone-50 p-3 font-mono text-sm leading-relaxed"
               />
               <p aria-live="polite" className="min-h-5 text-sm font-bold">
@@ -147,18 +147,18 @@ export function AnimationGenerateDialog({ menu, current, onSave, onClose }: Prop
                 {copyStatus === 'failed' && <span className="text-rose-600">自動でコピーできませんでした。上の文章が全て選ばれた状態なので、そのままコピーしてください。</span>}
               </p>
               <label className="block space-y-1 border-t border-slate-200 pt-3">
-                <span className="font-bold">Claudeの回答を貼り付けてください</span>
+                <span className="font-bold">AIの回答を貼り付けてください</span>
                 <textarea
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
                   rows={6}
-                  placeholder='Claudeの回答（{ "animation": … } で始まるJSON）をここに貼り付け'
+                  placeholder='AIの回答（{ "animation": … } で始まるJSON）をここに貼り付け'
                   className={`${fieldClass} resize-y font-mono text-sm ${errors.length ? 'border-rose-500' : ''}`}
                 />
               </label>
               {errors.length > 0 && (
                 <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
-                  <p className="font-bold">この回答は使えません（{errors.length}件の問題）。Claudeに問題点を伝えて作り直してもらってください。</p>
+                  <p className="font-bold">この回答は使えません（{errors.length}件の問題）。AIに問題点を伝えて作り直してもらってください。</p>
                   <ul className="mt-1 list-disc space-y-0.5 pl-5 break-words">
                     {errors.slice(0, 20).map((e, i) => (
                       <li key={i}>{e}</li>
@@ -188,7 +188,7 @@ export function AnimationGenerateDialog({ menu, current, onSave, onClose }: Prop
           </button>
           {requested ? (
             <button type="button" onClick={copyPrompt} className="order-1 col-span-2 rounded-lg bg-violet-600 px-2 py-3 font-bold text-white hover:bg-violet-700 md:order-2 md:col-span-1">
-              📋 Claudeへの依頼文をコピー
+              📋 AIへの依頼文をコピー
             </button>
           ) : (
             <button

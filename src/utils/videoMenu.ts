@@ -3,7 +3,7 @@ import type { MenuInput, PracticeMenu } from '../types/menu'
 import { extractJSON } from './aiPlan'
 import { normalizeForSearch } from './filters'
 
-// 動画URLから練習メニューを抽出してもらうための依頼文（Claudeに手動で貼り付ける。アプリから動画へはアクセスしない）
+// 動画URLから練習メニューを抽出してもらうための依頼文（AIに手動で貼り付ける。アプリから動画へはアクセスしない）
 export function buildVideoMenuPrompt(url: string, note: string): string {
   return `あなたは日本の中学校バスケットボール部の指導を手伝うコーチです。
 次の動画を確認し、動画内に登場するバスケットボールの練習メニューを抽出・整理してください。
@@ -129,7 +129,7 @@ export function parseVideoAnswer(answer: string, videoUrl: string) {
   const o = (data && typeof data === 'object' ? data : {}) as Record<string, unknown>
   const summary = text(o.summary)
   if (!Array.isArray(o.items)) {
-    throw new Error('Claudeの回答に "items"（メニューの一覧）が見つかりませんでした。依頼文で指定した形式の回答を貼り付けてください。')
+    throw new Error('AIの回答に "items"（メニューの一覧）が見つかりませんでした。依頼文で指定した形式の回答を貼り付けてください。')
   }
   const source = { sourceType: sourceTypeFromUrl(videoUrl), sourceUrl: videoUrl.trim() || undefined, sourceTitle: text(o.videoTitle) || undefined }
   const items = (o.items as unknown[]).map(toCandidate)
@@ -137,7 +137,7 @@ export function parseVideoAnswer(answer: string, videoUrl: string) {
     .filter((c): c is VideoMenuCandidate => c !== null)
     .map((c) => ({ ...c, input: { ...c.input, ...source } }))
   if (valid.length === 0) {
-    throw new Error(`練習メニューを抽出できませんでした。${summary ? `（Claudeからの説明：${summary}）` : ''}`)
+    throw new Error(`練習メニューを抽出できませんでした。${summary ? `（AIからの説明：${summary}）` : ''}`)
   }
   return { summary, items: valid, excluded: items.length - valid.length }
 }

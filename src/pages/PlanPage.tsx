@@ -3,10 +3,12 @@ import { flushSync } from 'react-dom'
 import { AIPlanDialog } from '../components/AIPlanDialog'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { PrintPlan } from '../components/PrintPlan'
+import { ShareButton } from '../components/ShareButton'
 import type { AIPlanConditions, AIPlanProposal, PracticeMenu } from '../types/menu'
 import { ALL, EMPTY_CONDITIONS, filterMenus } from '../utils/filters'
 import { PLAN_TARGETS, type PlanActions } from '../utils/plan'
 import type { SessionActions } from '../utils/session'
+import { buildShareText } from '../utils/sharePlan'
 
 const STEP = 5
 
@@ -239,6 +241,7 @@ type Props = {
 export function PlanPage({
   menus,
   plan,
+  getPlan,
   items,
   addItem,
   removeItem,
@@ -385,7 +388,16 @@ export function PlanPage({
             <a href="#/saved" className="py-2 text-sm font-bold text-orange-700 hover:underline">
               📚 保存済み計画（{savedCount}件）
             </a>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <ShareButton
+                disabled={rows.length === 0}
+                getText={() => {
+                  // 入力中の欄を確定させてから、最新の計画で共有用テキストを作る
+                  const el = document.activeElement
+                  if (el instanceof HTMLElement) flushSync(() => el.blur())
+                  return buildShareText(getPlan(), menus)
+                }}
+              />
               <button
                 type="button"
                 disabled={rows.length === 0}
