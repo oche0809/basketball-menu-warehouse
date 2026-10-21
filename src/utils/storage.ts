@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { LIBRARY_VERSION, createLibraryMenus } from '../data/libraryMenus'
 import { LIBRARY2_VERSION, createLibraryMenus2 } from '../data/libraryMenus2'
 import { LIBRARY3_VERSION, createLibraryMenus3 } from '../data/libraryMenus3'
+import { LIBRARY4_VERSION, createLibraryMenus4 } from '../data/libraryMenus4'
 import { createSampleMenus } from '../data/sampleMenus'
 import type { MenuInput, PracticeMenu } from '../types/menu'
 
@@ -13,6 +14,7 @@ const LIBRARY_PACKS = [
   { key: LIBRARY_KEY, version: LIBRARY_VERSION, create: createLibraryMenus },
   { key: 'basketball-menu-warehouse-library-2', version: LIBRARY2_VERSION, create: createLibraryMenus2 },
   { key: 'basketball-menu-warehouse-library-3', version: LIBRARY3_VERSION, create: createLibraryMenus3 },
+  { key: 'basketball-menu-warehouse-library-4', version: LIBRARY4_VERSION, create: createLibraryMenus4 },
 ]
 
 export function loadJSON(key: string): unknown {
