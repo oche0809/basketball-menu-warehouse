@@ -104,6 +104,8 @@ export type AIPlanConditions = {
   equipment: string[]
   difficulty: string
   request: string
+  // 練習場所（体育館／体育館なし）。体育館なしのときは「体育館なし」タグのメニューだけを候補にする
+  place: string
 }
 
 // AIの提案（検証済み）。menuId は必ずメニュー倉庫に存在するものだけ

@@ -378,7 +378,7 @@ export function PlanPage({
             onClick={() => setAiOpen(true)}
             className="w-full rounded-lg border border-violet-300 bg-violet-50 px-4 py-3 font-bold text-violet-800 hover:bg-violet-100 sm:w-auto"
           >
-            🤖 Claudeで練習計画を作る
+            🤖 AIで練習計画を作る（Gemini・Claude など）
           </button>
 
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">

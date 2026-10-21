@@ -3,7 +3,7 @@ import { DIFFICULTIES } from '../data/options'
 import { TimeSummary, fieldClass } from '../pages/PlanPage'
 import { ConfirmDialog } from './ConfirmDialog'
 import type { AIPlanConditions, AIPlanProposal, PracticeMenu } from '../types/menu'
-import { buildClaudePrompt, parseClaudeAnswer, selectCandidates } from '../utils/aiPlan'
+import { NO_GYM_PLACE, PLACES, buildAIPlanPrompt, parseAIPlanAnswer, selectCandidates } from '../utils/aiPlan'
 import { buildOptions } from '../utils/filters'
 import { PLAN_TARGETS } from '../utils/plan'
 
@@ -47,15 +47,14 @@ const Label = ({ children, required }: { children: string; required?: boolean })
 const ErrorText = ({ text }: { text?: string }) => (text ? <p className="text-sm font-bold text-rose-600">{text}</p> : null)
 
 // AIの提案の表示。メニュー名・カテゴリは AI の返答ではなく、menuId から今のメニュー倉庫を見て表示する
-// Phase 7-3（Claudeの回答の取り込み）で使う
 export function ProposalView({ proposal, warnings, conditions, menus }: { proposal: AIPlanProposal; warnings: string[]; conditions: AIPlanConditions; menus: PracticeMenu[] }) {
   const menuMap = new Map(menus.map((m) => [m.id, m]))
   const total = proposal.items.reduce((sum, i) => sum + i.duration, 0)
   return (
     <div className="space-y-3">
-      <p className="text-lg font-bold">🤖 Claudeが作成した練習計画</p>
+      <p className="text-lg font-bold">🤖 AIが作成した練習計画</p>
       <p className="text-sm text-slate-600">
-        {[conditions.targetLevel, `${conditions.players}人`, `${conditions.plannedDuration}分`, conditions.theme, conditions.focus].filter(Boolean).join('・')}
+        {[conditions.targetLevel, conditions.place === NO_GYM_PLACE && '体育館なし', `${conditions.players}人`, `${conditions.plannedDuration}分`, conditions.theme, conditions.focus].filter(Boolean).join('・')}
       </p>
       {proposal.summary && <p className="rounded-lg border border-violet-200 bg-violet-50 p-3 break-words whitespace-pre-wrap text-violet-900">{proposal.summary}</p>}
       <TimeSummary planned={conditions.plannedDuration} total={total} />
@@ -96,7 +95,7 @@ type Props = {
   onClose: () => void
 }
 
-// Claudeに依頼する条件の入力 → 確認 → 依頼文の作成とコピー → 回答の貼り付けと確認 → 取り込み。
+// AI（Gemini・Claude など）に依頼する条件の入力 → 確認 → 依頼文の作成とコピー → 回答の貼り付けと確認 → 取り込み。
 // AIサービスには一切通信しない。「この計画を使う」を確定するまで現在の練習計画は変更しない
 export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
   const [form, setForm] = useState<Form>({
@@ -108,6 +107,7 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
     equipment: [],
     difficulty: ANY_DIFFICULTY,
     request: '',
+    place: PLACES[0],
   })
   const [errors, setErrors] = useState<Errors>({})
   const [confirmed, setConfirmed] = useState<AIPlanConditions | null>(null)
@@ -117,17 +117,18 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
   // 貼り付けた回答は、条件を直したり解析をやり直したりしても消さない
   const [answer, setAnswer] = useState('')
   const [parseError, setParseError] = useState('')
+  const [promptError, setPromptError] = useState('')
   const [result, setResult] = useState<{ proposal: AIPlanProposal; warnings: string[] } | null>(null)
   const [confirmingUse, setConfirmingUse] = useState(false)
 
   // 回答を読み取って提案として表示する（ここでは現在の練習計画を変更しない）
   const analyzeAnswer = () => {
     try {
-      setResult(parseClaudeAnswer(answer, menus))
+      setResult(parseAIPlanAnswer(answer, menus))
       setParseError('')
     } catch (e) {
       setResult(null)
-      setParseError(e instanceof Error ? e.message : 'Claudeの回答を読み取れませんでした。')
+      setParseError(e instanceof Error ? e.message : 'AIの回答を読み取れませんでした。')
     }
   }
 
@@ -136,7 +137,13 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
   // 条件と、メニュー倉庫から選んだ候補で依頼文を作る（通信はしない）
   const makePrompt = () => {
     if (!confirmed) return
-    setPrompt(buildClaudePrompt(confirmed, selectCandidates(menus, confirmed)))
+    const candidates = selectCandidates(menus, confirmed)
+    if (candidates.length === 0) {
+      setPromptError('「体育館なし」のタグが付いたメニューがメニュー倉庫にありません。練習場所を「体育館」にするか、メニューに「体育館なし」のタグを付けてください。')
+      return
+    }
+    setPromptError('')
+    setPrompt(buildAIPlanPrompt(confirmed, candidates))
     setCopyStatus('idle')
   }
 
@@ -172,6 +179,7 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
   const summary: [string, string][] = confirmed
     ? [
         ['対象', confirmed.targetLevel],
+        ['練習場所', confirmed.place],
         ['人数', `${confirmed.players}人`],
         ['練習時間', `${confirmed.plannedDuration}分`],
         ['テーマ', confirmed.theme || '指定なし'],
@@ -187,11 +195,11 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Claudeで練習計画を作る"
+        aria-label="AIで練習計画を作る"
         className="flex h-full w-full flex-col bg-white md:h-auto md:max-h-[90vh] md:max-w-2xl md:rounded-2xl md:shadow-xl"
       >
         <div className="flex items-center justify-between gap-3 border-b border-slate-200 p-4">
-          <h2 className="text-lg font-bold">🤖 Claudeで練習計画を作る</h2>
+          <h2 className="text-lg font-bold">🤖 AIで練習計画を作る</h2>
           <button type="button" onClick={close} className="rounded-lg px-3 py-2 font-bold text-slate-500 hover:bg-slate-100">
             閉じる
           </button>
@@ -202,11 +210,11 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
             <ProposalView proposal={result.proposal} warnings={result.warnings} conditions={confirmed} menus={menus} />
           ) : prompt ? (
             <div className="space-y-3">
-              <p className="text-lg font-bold">Claudeへの依頼文</p>
+              <p className="text-lg font-bold">AIへの依頼文</p>
               <ol className="list-decimal space-y-0.5 rounded-lg bg-violet-50 py-2 pr-3 pl-8 text-sm text-violet-900">
-                <li>下の「📋 Claudeへの依頼文をコピー」を押します。</li>
-                <li>Claude（アプリまたは claude.ai）を開いて貼り付け、送信します。</li>
-                <li>Claudeの回答をコピーして、下の欄に貼り付け、「回答を解析する」を押します。</li>
+                <li>下の「📋 AIへの依頼文をコピー」を押します。</li>
+                <li>Gemini や Claude などのAIを開いて貼り付け、送信します（学校で使えるAIでかまいません）。</li>
+                <li>AIの回答をコピーして、下の欄に貼り付け、「回答を解析する」を押します（```json などで囲まれていても、そのまま貼り付けてOKです）。</li>
               </ol>
               <textarea
                 ref={promptRef}
@@ -214,7 +222,7 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
                 readOnly
                 rows={8}
                 onFocus={(e) => e.currentTarget.select()}
-                aria-label="Claudeへの依頼文"
+                aria-label="AIへの依頼文"
                 className="block w-full resize-y rounded-lg border border-slate-300 bg-stone-50 p-3 font-mono text-sm leading-relaxed"
               />
               <p aria-live="polite" className="min-h-5 text-sm font-bold">
@@ -224,12 +232,12 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
                 )}
               </p>
               <label className="block space-y-1 border-t border-slate-200 pt-3">
-                <span className="font-bold">Claudeの回答を貼り付けてください</span>
+                <span className="font-bold">AIの回答を貼り付けてください</span>
                 <textarea
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
                   rows={6}
-                  placeholder="Claudeの回答（{ &quot;summary&quot;: … } で始まるJSON）をここに貼り付け"
+                  placeholder="AIの回答（{ &quot;summary&quot;: … } で始まるJSON）をここに貼り付け"
                   className={`${fieldClass} resize-y font-mono text-sm ${parseError ? 'border-rose-500' : ''}`}
                 />
               </label>
@@ -250,7 +258,7 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
             </div>
           ) : confirmed ? (
             <div className="space-y-3">
-              <p className="font-bold">Claudeに依頼する条件</p>
+              <p className="font-bold">AIに依頼する条件</p>
               <dl className="divide-y divide-slate-100 rounded-xl border border-slate-200">
                 {summary.map(([label, value]) => (
                   <div key={label} className="grid grid-cols-[6.5rem_1fr] gap-2 px-3 py-2.5">
@@ -259,7 +267,12 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
                   </div>
                 ))}
               </dl>
-              <p className="text-sm text-slate-500">この条件と、メニュー倉庫から選んだ候補メニューをまとめて、Claudeに貼り付ける依頼文を作ります。現在の練習計画は変更されません。</p>
+              <p className="text-sm text-slate-500">この条件と、メニュー倉庫から選んだ候補メニューをまとめて、AIに貼り付ける依頼文を作ります。現在の練習計画は変更されません。</p>
+              {promptError && (
+                <p role="alert" className="text-sm font-bold break-words text-rose-600">
+                  {promptError}
+                </p>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
@@ -305,6 +318,30 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
                   <ErrorText text={errors.plannedDuration} />
                 </div>
               </div>
+
+              <fieldset className="space-y-1">
+                <legend>
+                  <Label required>練習場所</Label>
+                </legend>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {PLACES.map((p) => {
+                    const on = form.place === p
+                    return (
+                      <button
+                        key={p}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => update({ place: p })}
+                        className={`min-h-11 rounded-full border px-4 text-sm font-medium ${on ? 'border-orange-600 bg-orange-600 text-white' : 'border-slate-300 bg-white text-slate-700'}`}
+                      >
+                        {on ? '✓ ' : ''}
+                        {p}
+                      </button>
+                    )
+                  })}
+                </div>
+                {form.place === NO_GYM_PLACE && <p className="text-sm text-slate-500">「体育館なし」のタグが付いたメニュー（ランニング・筋トレ・ボールだけの練習など）から計画を作ります。</p>}
+              </fieldset>
 
               <label className="block space-y-1">
                 <Label>練習テーマ</Label>
@@ -378,7 +415,7 @@ export function AIPlanDialog({ menus, initial, onApply, onClose }: Props) {
                 ← 条件を修正
               </button>
               <button type="button" onClick={copyPrompt} className="order-1 col-span-2 rounded-lg bg-violet-600 px-2 py-3 font-bold text-white hover:bg-violet-700 md:order-2 md:col-span-1">
-                📋 Claudeへの依頼文をコピー
+                📋 AIへの依頼文をコピー
               </button>
             </>
           ) : confirmed ? (
