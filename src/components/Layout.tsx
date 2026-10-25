@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useOnline } from '../utils/online'
 
 const NAV = [
   { key: 'home', href: '#/', label: 'ホーム', icon: '🏠' },
@@ -11,6 +12,7 @@ const NAV = [
 ]
 
 export function Layout({ current, actions, children }: { current: string; actions?: ReactNode; children: ReactNode }) {
+  const online = useOnline()
   return (
     <div className="min-h-screen bg-stone-50 pb-24 text-slate-800 md:pb-10 print:bg-white print:p-0">
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white print:hidden">
@@ -39,6 +41,12 @@ export function Layout({ current, actions, children }: { current: string; action
           {actions}
         </div>
       </header>
+
+      {!online && (
+        <p role="status" className="bg-slate-700 px-4 py-2 text-center text-sm font-bold text-white print:hidden">
+          📴 オフラインです。メニュー・動き・記録は使えます（参考動画は見られません）。
+        </p>
+      )}
 
       <main className="mx-auto max-w-7xl px-4 py-6 lg:px-8 lg:py-8 print:max-w-none print:p-0">{children}</main>
 
