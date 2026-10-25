@@ -7,7 +7,7 @@ import type { MenuAnimation, MenuVideo, PracticeMenu } from '../types/menu'
 import { getMenuAnimation } from '../utils/animation'
 import { VIDEO_NOTE, VideoEditorDialog, VideoList } from '../components/ReferenceVideos'
 import { getMenuVideos, getReferenceVideos } from '../utils/referenceVideos'
-import { formatDate } from './PlanPage'
+import { formatDate } from '../utils/format'
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (

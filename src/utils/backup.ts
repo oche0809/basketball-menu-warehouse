@@ -1,6 +1,8 @@
 import type { PracticeLogEntry, PracticeMenu, PracticePlan, SavedPlan } from '../types/menu'
 import { normalizeAnimation } from './animation'
+import { markBackedUp } from './dataSafety'
 import { normalizeLog } from './practiceLog'
+import { normalizePlayers, normalizeRecords, normalizeTests, type PlayersData } from './players'
 import { normalizeVideos } from './referenceVideos'
 import { normalizePlan, today } from './plan'
 import { normalizeSaved } from './savedPlans'
@@ -16,10 +18,17 @@ const LIST_KEYS = ['equipment', 'coachingPoints', 'commonMistakes', 'tags'] as c
 const SOURCE_KEYS = ['sourceType', 'sourceTitle', 'sourceUrl', 'sourceNote'] as const
 
 // plan・savedPlans を含まない古いファイルでは null（今の内容をそのまま残す）
-export type BackupData = { menus: PracticeMenu[]; plan: PracticePlan | null; savedPlans: SavedPlan[] | null; practiceLog: PracticeLogEntry[] | null }
+export type BackupData = {
+  menus: PracticeMenu[]
+  plan: PracticePlan | null
+  savedPlans: SavedPlan[] | null
+  practiceLog: PracticeLogEntry[] | null
+  // 選手の記録（旧形式にはないので null＝今のままにする）
+  playersData: PlayersData | null
+}
 
-export function exportMenus(menus: PracticeMenu[], plan: PracticePlan, savedPlans: SavedPlan[], practiceLog: PracticeLogEntry[]) {
-  const data = { app: APP_ID, version: 1, exportedAt: new Date().toISOString(), menus, plan, savedPlans, practiceLog }
+export function exportMenus(menus: PracticeMenu[], plan: PracticePlan, savedPlans: SavedPlan[], practiceLog: PracticeLogEntry[], playersData: PlayersData) {
+  const data = { app: APP_ID, version: 1, exportedAt: new Date().toISOString(), menus, plan, savedPlans, practiceLog, playersData }
   const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
   const a = document.createElement('a')
   a.href = url
@@ -28,6 +37,7 @@ export function exportMenus(menus: PracticeMenu[], plan: PracticePlan, savedPlan
   a.click()
   a.remove()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
+  markBackedUp()
 }
 
 const isText = (v: unknown): v is string => typeof v === 'string'
@@ -78,7 +88,9 @@ export function parseBackup(text: string): BackupData | null {
       : null
     // 実施記録（旧形式にはないので null＝今の記録をそのまま残す）
     const practiceLog = Array.isArray(data?.practiceLog) ? normalizeLog(data.practiceLog) : null
-    return { menus: menus as PracticeMenu[], plan, savedPlans, practiceLog }
+    const pd = data?.playersData && typeof data.playersData === 'object' ? data.playersData : null
+    const playersData = pd ? { players: normalizePlayers(pd.players), tests: normalizeTests(pd.tests) ?? [], records: normalizeRecords(pd.records) } : null
+    return { menus: menus as PracticeMenu[], plan, savedPlans, practiceLog, playersData }
   } catch {
     return null
   }

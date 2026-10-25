@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { CATEGORIES, DIFFICULTIES } from '../data/options'
-import { fieldClass } from '../pages/PlanPage'
+import { fieldClass } from '../utils/format'
 import type { MenuAnimation, PracticeMenu } from '../types/menu'
 import { hasAnimation, hasBrokenAnimation } from '../utils/animation'
 import { BULK_BATCH_SIZE, buildBulkAnimationPrompt, parseBulkAnimationAnswer, type BulkParseResult } from '../utils/animationPrompt'

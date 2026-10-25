@@ -6,7 +6,7 @@ import type { MenuAnimation } from '../types/menu'
 import { OFFICIAL_ANIMATIONS } from '../utils/animation'
 import { getReferenceVideos } from '../utils/referenceVideos'
 import { decodeStudentPlan, type StudentItem, type StudentPlan } from '../utils/studentView'
-import { formatDate } from './PlanPage'
+import { formatDate } from '../utils/format'
 
 function ItemCard({ item, index }: { item: StudentItem; index: number }) {
   const [showAnimation, setShowAnimation] = useState(false)

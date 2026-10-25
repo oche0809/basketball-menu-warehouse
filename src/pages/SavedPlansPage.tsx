@@ -3,13 +3,16 @@ import { ConfirmDialog } from '../components/ConfirmDialog'
 import { ImportSharedDialog } from '../components/ImportSharedDialog'
 import { PrintPlan } from '../components/PrintPlan'
 import { ShareButton } from '../components/ShareButton'
+import { RecordSavedPlanDialog } from '../components/LogDialogs'
+import type { PracticeLogActions } from '../utils/practiceLog'
 import { StudentLinkButton } from '../components/StudentLinkButton'
 import type { PracticeMenu, SavedPlan } from '../types/menu'
 import { ALL } from '../utils/filters'
 import { PLAN_TARGETS } from '../utils/plan'
 import { EMPTY_SAVED_FILTER, SAVED_COUNT_RANGES, SAVED_DURATION_RANGES, filterSavedPlans, planTotal, type SavedFilter } from '../utils/savedPlans'
 import { buildShareText } from '../utils/sharePlan'
-import { TimeSummary, formatDate, printPage } from './PlanPage'
+import { TimeSummary } from './PlanPage'
+import { formatDate, printPage } from '../utils/format'
 
 const formatSavedAt = (iso: string) => {
   const d = new Date(iso)
@@ -228,10 +231,14 @@ type DetailProps = {
   onUse: () => void
   onDelete: () => void
   onToggleFavorite: () => void
+  // 「この日にやった」と実施記録にまとめて追加する
+  onRecord: PracticeLogActions['addEntries']
 }
 
-export function SavedPlanDetail({ plan, menus, hasCurrentPlan, onUse, onDelete, onToggleFavorite }: DetailProps) {
+export function SavedPlanDetail({ plan, menus, hasCurrentPlan, onUse, onDelete, onToggleFavorite, onRecord }: DetailProps) {
   const [confirm, setConfirm] = useState<'use' | 'delete' | null>(null)
+  const [recording, setRecording] = useState(false)
+  const [recorded, setRecorded] = useState(0)
   const menuMap = new Map(menus.map((m) => [m.id, m]))
 
   return (
@@ -242,6 +249,13 @@ export function SavedPlanDetail({ plan, menus, hasCurrentPlan, onUse, onDelete, 
             ← 保存済み一覧へ
           </a>
           <div className="flex flex-wrap items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setRecording(true)}
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold whitespace-nowrap text-slate-700 hover:bg-slate-50"
+            >
+              {recorded > 0 ? `✓ ${recorded}件を記録しました` : '📊 実施記録に追加'}
+            </button>
             <StudentLinkButton getPlan={() => plan} menus={menus} />
             <ShareButton getText={() => buildShareText(plan, menus)} />
             <button
@@ -342,6 +356,17 @@ export function SavedPlanDetail({ plan, menus, hasCurrentPlan, onUse, onDelete, 
         />
       </div>
       {/* 保存済み計画は、保存時のメニュー名・カテゴリを優先して印刷する */}
+      {recording && (
+        <RecordSavedPlanDialog
+          plan={plan}
+          menus={menus}
+          onAdd={(entries) => {
+            onRecord(entries)
+            setRecorded(entries.length)
+          }}
+          onClose={() => setRecording(false)}
+        />
+      )}
       <PrintPlan
         plan={plan}
         rows={plan.items.map((item) => {

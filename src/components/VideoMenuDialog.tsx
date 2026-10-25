@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { fieldClass } from '../pages/PlanPage'
+import { fieldClass } from '../utils/format'
 import type { MenuInput, PracticeMenu } from '../types/menu'
 import { buildVideoMenuPrompt, findSimilarMenus, parseVideoAnswer } from '../utils/videoMenu'
 import { ConfirmDialog } from './ConfirmDialog'

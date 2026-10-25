@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "check:videos": "node scripts/check-videos.mjs"
+    "check:videos": "node scripts/check-videos.mjs",
+    "test": "vitest run"
   },
   "dependencies": {
     "qrcode-generator": "^2.0.4",
@@ -24,6 +25,7 @@
     "oxlint": "^1.81.0",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
-    "vite": "^8.3.0"
+    "vite": "^8.3.0",
+    "vitest": "^5.0.3"
   }
 }

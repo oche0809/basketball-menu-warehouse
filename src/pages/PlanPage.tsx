@@ -10,23 +10,14 @@ import { ALL, EMPTY_CONDITIONS, filterMenus } from '../utils/filters'
 import { PLAN_TARGETS, type PlanActions } from '../utils/plan'
 import type { SessionActions } from '../utils/session'
 import { buildShareText } from '../utils/sharePlan'
+import { formatDate, fieldClass, timeDiffLabel, printPage } from '../utils/format'
 
 const STEP = 5
 
-const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土']
-
-export function formatDate(date: string) {
-  const [y, m, d] = date.split('-').map(Number)
-  if (!y || !m || !d) return ''
-  return `${y}年${m}月${d}日（${WEEKDAYS[new Date(y, m - 1, d).getDay()]}）`
-}
-
-export const fieldClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-base focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200'
-
 // 入力中は自由に打てるようにし、確定（フォーカスを外す）時に範囲・刻みをそろえる
 // 入力中の値は画面内だけで持ち、確定時（フォーカスが外れる・Enter・画面を離れる）に保存する
-function useDraft(value: string, onCommit: (draft: string) => void) {
+// onCommit が文字列を返したときは、確定後の表示をその値にそろえる（例：範囲外の数を min〜max に直して見せる）
+function useDraft(value: string, onCommit: (draft: string) => string | void) {
   const [draft, setDraft] = useState(value)
   const latest = useRef({ draft, value, onCommit })
   useLayoutEffect(() => {
@@ -34,7 +25,9 @@ function useDraft(value: string, onCommit: (draft: string) => void) {
   })
   const commit = () => {
     const { draft, value, onCommit } = latest.current
-    if (draft !== value) onCommit(draft)
+    if (draft === value) return
+    const shown = onCommit(draft)
+    if (typeof shown === 'string') setDraft(shown)
   }
   // ページ移動などで入力欄が消えるときも確定させる
   useEffect(() => () => commit(), [])
@@ -51,8 +44,8 @@ function NumberInput({ value, min, max, step, onCommit }: { value: number; min: 
           ? 0
           : value
         : Math.min(max, Math.max(min, Math.round(n / step) * step))
-    setDraft(next > 0 ? String(next) : '')
     if (next !== value) onCommit(next)
+    return next > 0 ? String(next) : ''
   })
   return (
     <input
@@ -126,17 +119,6 @@ function ReflectionInput({ value, onCommit }: { value: string; onCommit: (v: str
   )
 }
 
-export function timeDiffLabel(planned: number, total: number) {
-  const diff = planned - total
-  return diff > 0 ? `あと${diff}分` : diff === 0 ? 'ぴったり' : `${-diff}分オーバー`
-}
-
-// 入力中の欄を確定させてから印刷する（印刷自体はデータを変えない）
-export function printPage() {
-  const el = document.activeElement
-  if (el instanceof HTMLElement) flushSync(() => el.blur())
-  window.print()
-}
 
 export function TimeSummary({ planned, total }: { planned: number; total: number }) {
   const diff = planned - total

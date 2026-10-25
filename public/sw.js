@@ -2,7 +2,7 @@
 // 電波がないときでもメニュー・動き・練習計画・実施記録を開けるようにする（YouTube の動画は通信が必要）。
 // ・ページ本体（index.html）：まずネットから最新を取り、つながらなければ保存したものを使う
 // ・JS・CSS など（ファイル名に版が入っている）：保存したものを使い、なければネットから取って保存する
-const CACHE = 'bmw-app-v1'
+const CACHE = 'bmw-app-v2'
 const SCOPE = new URL(self.registration.scope)
 const INDEX = new URL('./', SCOPE).href
 
@@ -16,6 +16,13 @@ async function precache() {
   if (!res.ok) return
   await cache.put(INDEX, res.clone())
   await cache.addAll(assetUrls(await res.text()))
+  // 後から読み込むページのファイルも保存しておく（オフラインでも開けるように）
+  try {
+    const list = await (await fetch(new URL('asset-manifest.json', SCOPE), { cache: 'no-cache' })).json()
+    await cache.addAll(list.files.map((f) => new URL(f, SCOPE).href))
+  } catch {
+    // 一覧が取れなくても、開いたページから順に保存される
+  }
 }
 
 self.addEventListener('install', (event) => {
@@ -31,12 +38,23 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-// 新しい index.html が使うファイル以外の古い JS・CSS を消して、保存容量が増え続けないようにする
-async function pruneAssets(cache, html) {
-  const used = new Set(assetUrls(html))
-  for (const req of await cache.keys()) {
-    if (req.url.includes('/assets/') && !used.has(req.url)) await cache.delete(req)
+// 今の版のファイル一覧（index.html が読むもの＋後から読み込むページ）。一覧が取れなければ null
+async function currentFiles(html) {
+  try {
+    const list = await (await fetch(new URL('asset-manifest.json', SCOPE), { cache: 'no-cache' })).json()
+    return new Set([...assetUrls(html), ...list.files.map((f) => new URL(f, SCOPE).href)])
+  } catch {
+    return null
   }
+}
+
+// アプリが更新されたら、新しい版のファイルを保存し、古い版の JS・CSS を消す（保存容量が増え続けないように）
+async function refreshAssets(cache, html) {
+  const files = await currentFiles(html)
+  if (!files) return
+  const cached = new Set((await cache.keys()).map((r) => r.url))
+  await cache.addAll([...files].filter((u) => u.includes('/assets/') && !cached.has(u))).catch(() => {})
+  for (const url of cached) if (url.includes('/assets/') && !files.has(url)) await cache.delete(url)
 }
 
 async function handlePage(request) {
@@ -46,7 +64,7 @@ async function handlePage(request) {
     const res = await fetch(request.url, { cache: 'no-cache', credentials: 'same-origin' })
     if (res.ok) {
       await cache.put(INDEX, res.clone())
-      pruneAssets(cache, await res.clone().text())
+      refreshAssets(cache, await res.clone().text())
     }
     return res
   } catch {

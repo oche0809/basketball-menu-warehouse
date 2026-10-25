@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { DIFFICULTIES } from '../data/options'
-import { TimeSummary, fieldClass } from '../pages/PlanPage'
+import { TimeSummary } from '../pages/PlanPage'
+import { fieldClass } from '../utils/format'
 import { ConfirmDialog } from './ConfirmDialog'
 import type { AIPlanConditions, AIPlanProposal, PracticeMenu } from '../types/menu'
 import { NO_GYM_PLACE, PLACES, buildAIPlanPrompt, parseAIPlanAnswer, selectCandidates } from '../utils/aiPlan'

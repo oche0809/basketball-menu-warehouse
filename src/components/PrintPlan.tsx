@@ -1,4 +1,4 @@
-import { formatDate, timeDiffLabel } from '../pages/PlanPage'
+import { formatDate, timeDiffLabel } from '../utils/format'
 
 export type PrintRow = { key: string; title: string; category: string; duration: number; note?: string; nextNote?: string }
 

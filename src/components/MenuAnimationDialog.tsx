@@ -130,22 +130,20 @@ export function MenuAnimationDialog({ title, animation, onClose, label = '🎬 �
   const frames = buildFrames(animation)
   const last = animation.steps.length
   const [step, setStep] = useState(0)
-  const [playing, setPlaying] = useState(false)
+  const [playRequested, setPlaying] = useState(false)
+  // 最後のステップまで行ったら、再生は自動で止まった扱いにする
+  const playing = playRequested && step < last
 
-  // 再生中は一定間隔で次のステップへ。最後まで行ったら止まる
+  // 再生中は一定間隔で次のステップへ
   useEffect(() => {
     if (!playing) return
-    if (step >= last) {
-      setPlaying(false)
-      return
-    }
     const t = setTimeout(() => setStep((s) => Math.min(last, s + 1)), step === 0 ? 400 : STEP_MS)
     return () => clearTimeout(t)
   }, [playing, step, last])
 
   const togglePlay = () => {
     if (!playing && step >= last) setStep(0)
-    setPlaying((p) => !p)
+    setPlaying(!playing)
   }
   const go = (delta: number) => {
     setPlaying(false)

@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { fieldClass } from '../pages/PlanPage'
+import { fieldClass } from '../utils/format'
 import type { MenuAnimation, PracticeMenu } from '../types/menu'
 import { buildAnimationPrompt, buildAnimationRevisionPrompt, parseAnimationAnswer } from '../utils/animationPrompt'
 import { ConfirmDialog } from './ConfirmDialog'

@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { MenuAnimationDialog } from '../components/MenuAnimationDialog'
+import { PracticeTimer } from '../components/PracticeTimer'
 import { VideosDialog } from '../components/ReferenceVideos'
 import type { PracticeMenu, PracticePlan } from '../types/menu'
 import { getMenuAnimation } from '../utils/animation'
 import type { PracticeLogActions } from '../utils/practiceLog'
 import { getMenuVideos } from '../utils/referenceVideos'
 import type { SessionActions } from '../utils/session'
-import { TimeSummary, formatDate } from './PlanPage'
+import { TimeSummary } from './PlanPage'
+import { formatDate } from '../utils/format'
 
 const navButton =
   'h-14 rounded-xl border border-slate-300 bg-white text-lg font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30'
@@ -143,6 +145,7 @@ export function RunPage({ plan, menus, session, log }: Props) {
                   <span className="text-base">分</span>
                 </p>
               </div>
+              <PracticeTimer key={current.id} itemId={current.id} minutes={current.duration} onNext={isDone ? undefined : complete} />
               {(animation || videos.length > 0) && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {animation && (

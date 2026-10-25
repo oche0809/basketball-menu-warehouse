@@ -1,6 +1,7 @@
 import qrcode from 'qrcode-generator'
 import { useState } from 'react'
 import type { PracticeMenu, PracticePlan } from '../types/menu'
+import { formatDate } from '../utils/format'
 import { encodeStudentPlan, studentViewUrl } from '../utils/studentView'
 
 // QRコードを SVG の path にする（ライブラリの HTML 文字列は使わない）
@@ -19,6 +20,47 @@ function qrPath(text: string): { size: number; d: string } | null {
   }
 }
 
+const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
+
+// 配布用の1枚（メニュー一覧と QRコード）を新しいタブに作って印刷する。スマホを持っていない生徒にも配れるように
+function printHandout(plan: PracticePlan, menus: PracticeMenu[], url: string, notes: boolean) {
+  const menuMap = new Map(menus.map((m) => [m.id, m]))
+  const qr = qrPath(url)
+  const total = plan.items.reduce((s, i) => s + i.duration, 0)
+  const rows = plan.items
+    .map((item, i) => {
+      const m = menuMap.get(item.menuId)
+      if (!m) return ''
+      const points = m.coachingPoints.slice(0, 3).map((p) => `<li>${escapeHtml(p)}</li>`).join('')
+      const note = notes && item.note?.trim() ? `<p class="note">📝 ${escapeHtml(item.note.trim())}</p>` : ''
+      return `<section><h2><span>${i + 1}</span>${escapeHtml(m.title)}<em>${item.duration}分</em></h2>${m.purpose ? `<p>🎯 ${escapeHtml(m.purpose)}</p>` : ''}${points ? `<ul>${points}</ul>` : ''}${note}</section>`
+    })
+    .join('')
+  const qrSvg = qr
+    ? `<svg viewBox="-2 -2 ${qr.size + 4} ${qr.size + 4}" shape-rendering="crispEdges"><rect x="-2" y="-2" width="${qr.size + 4}" height="${qr.size + 4}" fill="#fff"/><path d="${qr.d}"/></svg>`
+    : ''
+  const html = `<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>${escapeHtml(plan.title || '今日の練習')}</title><style>
+    @page { size: A4; margin: 14mm }
+    body { font-family: system-ui, sans-serif; color: #1e293b; margin: 0; padding: 16px }
+    header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; border-bottom: 3px solid #ea580c; padding-bottom: 10px }
+    h1 { font-size: 22px; margin: 0 } .meta { color: #475569; margin: 4px 0 0 }
+    .qr { text-align: center; font-size: 11px; color: #475569; flex-shrink: 0 } .qr svg { width: 110px; height: 110px; display: block; margin: 0 auto 4px }
+    section { border-bottom: 1px solid #e2e8f0; padding: 8px 0; break-inside: avoid }
+    h2 { font-size: 16px; margin: 0 0 4px; display: flex; gap: 8px; align-items: baseline }
+    h2 span { background: #ea580c; color: #fff; border-radius: 999px; min-width: 22px; text-align: center; font-size: 13px }
+    h2 em { margin-left: auto; font-style: normal; color: #c2410c }
+    p { margin: 2px 0; font-size: 13px } ul { margin: 2px 0; padding-left: 20px; font-size: 13px } .note { background: #fef3c7; padding: 4px 6px; border-radius: 4px }
+  </style></head><body><header><div><h1>🏀 ${escapeHtml(plan.title || '今日の練習')}</h1><p class="meta">${[formatDate(plan.date), `${plan.items.length}メニュー`, `${total}分`].filter(Boolean).join('・')}</p></div>${
+    qrSvg ? `<div class="qr">${qrSvg}スマホで読み取ると<br>動き・動画が見られます</div>` : ''
+  }</header>${rows}<script>window.onload = () => setTimeout(() => window.print(), 300)</script></body></html>`
+  const w = window.open('', '_blank')
+  if (!w) return false
+  w.document.open()
+  w.document.write(html)
+  w.document.close()
+  return true
+}
+
 type Props = { getPlan: () => PracticePlan; menus: PracticeMenu[]; disabled?: boolean }
 
 // 生徒用ページ（見るだけ）のリンクと QRコードを作る
@@ -27,6 +69,7 @@ export function StudentLinkButton({ getPlan, menus, disabled }: Props) {
   const [withNotes, setWithNotes] = useState(false)
   const [url, setUrl] = useState('')
   const [copied, setCopied] = useState(false)
+  const [blocked, setBlocked] = useState(false)
 
   const build = async (notes: boolean) => {
     setUrl('')
@@ -111,6 +154,16 @@ export function StudentLinkButton({ getPlan, menus, disabled }: Props) {
                 </div>
               </>
             )}
+            {url && (
+              <button
+                type="button"
+                onClick={() => setBlocked(!printHandout(getPlan(), menus, url, withNotes))}
+                className="w-full rounded-lg border border-slate-300 py-3 font-bold text-slate-700 hover:bg-slate-50"
+              >
+                🖨️ 配布用に印刷（メニュー一覧＋QRコード）
+              </button>
+            )}
+            {blocked && <p className="text-sm font-bold text-rose-600">新しいタブを開けませんでした。ブラウザのポップアップブロックを解除してください。</p>}
             <p className="text-xs text-slate-500">
               リンクの中に今日の計画が入っています（サーバーには保存しません）。計画を変えたら、もう一度リンクを作り直してください。
             </p>

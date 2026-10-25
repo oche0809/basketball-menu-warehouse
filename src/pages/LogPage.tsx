@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from 'react'
-import { ConfirmDialog } from '../components/ConfirmDialog'
+import { AddLogDialog, EditLogDialog } from '../components/LogDialogs'
 import type { PracticeLogEntry, PracticeMenu } from '../types/menu'
-import { analyzeLog, daysBetween } from '../utils/practiceLog'
+import { analyzeLog, daysBetween, type PracticeLogActions } from '../utils/practiceLog'
 import { today } from '../utils/plan'
-import { formatDate } from './PlanPage'
+import { formatDate } from '../utils/format'
 
 const PERIODS: { label: string; days: number | null }[] = [
   { label: '7日', days: 7 },
@@ -12,7 +12,13 @@ const PERIODS: { label: string; days: number | null }[] = [
   { label: 'すべて', days: null },
 ]
 
-type Props = { entries: PracticeLogEntry[]; menus: PracticeMenu[]; onRemove: (id: string) => void }
+type Props = {
+  entries: PracticeLogEntry[]
+  menus: PracticeMenu[]
+  onRemove: (id: string) => void
+  onAdd: PracticeLogActions['addEntries']
+  onUpdate: PracticeLogActions['updateEntry']
+}
 
 function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -23,9 +29,10 @@ function Card({ title, children }: { title: string; children: ReactNode }) {
   )
 }
 
-export function LogPage({ entries, menus, onRemove }: Props) {
+export function LogPage({ entries, menus, onRemove, onAdd, onUpdate }: Props) {
   const [days, setDays] = useState<number | null>(30)
-  const [removing, setRemoving] = useState<PracticeLogEntry | null>(null)
+  const [editing, setEditing] = useState<PracticeLogEntry | null>(null)
+  const [adding, setAdding] = useState(false)
   const base = today()
   const { inRange, totalMinutes, practiceDays, byCategory, missing, dominant, staleFavorites } = analyzeLog(entries, menus, days, base)
   const menuIds = new Set(menus.map((m) => m.id))
@@ -44,6 +51,10 @@ export function LogPage({ entries, menus, onRemove }: Props) {
           <h1 className="text-2xl font-bold">📊 実施記録</h1>
           <p className="text-sm text-slate-500">練習実施画面で「✓ 実施済みにする」を押したメニューが記録されます。</p>
         </div>
+        <div className="flex flex-wrap items-center gap-2">
+        <button type="button" onClick={() => setAdding(true)} className="rounded-lg border border-orange-300 bg-white px-4 py-2.5 text-sm font-bold text-orange-700 hover:bg-orange-50">
+          ＋ 記録を追加
+        </button>
         <div className="flex gap-1 rounded-lg bg-slate-100 p-1" role="group" aria-label="集計する期間">
           {PERIODS.map((p) => (
             <button
@@ -57,12 +68,14 @@ export function LogPage({ entries, menus, onRemove }: Props) {
             </button>
           ))}
         </div>
+        </div>
       </div>
 
       {entries.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-600">
           <p className="font-bold">まだ実施記録がありません。</p>
           <p className="mt-2 text-sm">練習計画を作って「▶ 練習を始める」から実施し、メニューごとに「✓ 実施済みにする」を押すと記録されます。</p>
+          <p className="mt-1 text-sm">過去の練習は「＋ 記録を追加」や、保存済み計画の「📊 実施記録に追加」から入れられます。</p>
           <a href="#/plan" className="mt-4 inline-block font-bold text-orange-700 hover:underline">📝 練習計画へ</a>
         </div>
       ) : (
@@ -175,11 +188,11 @@ export function LogPage({ entries, menus, onRemove }: Props) {
                           </div>
                           <button
                             type="button"
-                            onClick={() => setRemoving(e)}
-                            aria-label={`${e.title}の記録を削除`}
-                            className="shrink-0 rounded px-2 py-1 text-sm text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                            onClick={() => setEditing(e)}
+                            aria-label={`${e.title}の記録を編集`}
+                            className="shrink-0 rounded px-2 py-1 text-sm text-slate-500 hover:bg-orange-50 hover:text-orange-700"
                           >
-                            削除
+                            編集
                           </button>
                         </li>
                       ))}
@@ -192,17 +205,22 @@ export function LogPage({ entries, menus, onRemove }: Props) {
         </>
       )}
 
-      <ConfirmDialog
-        open={removing !== null}
-        message="この実施記録を削除しますか？"
-        note={removing ? `${formatDate(removing.date)}　${removing.title}` : undefined}
-        confirmLabel="削除"
-        onCancel={() => setRemoving(null)}
-        onConfirm={() => {
-          if (removing) onRemove(removing.id)
-          setRemoving(null)
-        }}
-      />
+      {adding && <AddLogDialog menus={menus} onAdd={onAdd} onClose={() => setAdding(false)} />}
+      {editing && (
+        <EditLogDialog
+          key={editing.id}
+          entry={editing}
+          onSave={(patch) => {
+            onUpdate(editing.id, patch)
+            setEditing(null)
+          }}
+          onDelete={() => {
+            onRemove(editing.id)
+            setEditing(null)
+          }}
+          onClose={() => setEditing(null)}
+        />
+      )}
     </div>
   )
 }

@@ -65,9 +65,26 @@ export function usePracticeLog() {
 
   const remove = (id: string) => setEntries((prev) => prev.filter((e) => e.id !== id))
 
+  // 後から記録を追加する（保存済み計画からまとめて・手入力）。同じ日の同じ項目は上書き
+  const addEntries = (list: Omit<PracticeLogEntry, 'id' | 'recordedAt'>[]) => {
+    const recordedAt = new Date().toISOString()
+    const added = list.map((e) => ({ ...e, id: `${e.date}:${e.itemId}`, recordedAt }))
+    const ids = new Set(added.map((e) => e.id))
+    setEntries((prev) => [...prev.filter((e) => !ids.has(e.id)), ...added])
+  }
+
+  // 記録の日付・時間を直す（日付を変えると id も変わる）
+  const updateEntry = (id: string, patch: { date: string; duration: number }) =>
+    setEntries((prev) => {
+      const target = prev.find((e) => e.id === id)
+      if (!target) return prev
+      const next = { ...target, ...patch, id: `${patch.date}:${target.itemId}` }
+      return [...prev.filter((e) => e.id !== id && e.id !== next.id), next]
+    })
+
   const replaceLog = (list: PracticeLogEntry[]) => setEntries(list)
 
-  return { entries, record, unrecord, remove, replaceLog }
+  return { entries, record, unrecord, remove, addEntries, updateEntry, replaceLog }
 }
 
 export type PracticeLogActions = ReturnType<typeof usePracticeLog>

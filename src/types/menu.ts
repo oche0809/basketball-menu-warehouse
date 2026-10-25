@@ -132,3 +132,12 @@ export type PracticeLogEntry = {
   planTitle: string
   recordedAt: string
 }
+
+// ---- 選手の記録 ----
+export type Player = { id: string; name: string; number: string; grade: string; active: boolean }
+
+// 測定項目（例：フリースロー10本中の成功数）。better：数が大きいほど良い（higher）か、小さいほど良い（lower）か
+export type RecordTest = { id: string; name: string; unit: string; better: 'higher' | 'lower' }
+
+// 1人・1項目・1日につき1件
+export type PlayerRecord = { id: string; playerId: string; testId: string; date: string; value: number }

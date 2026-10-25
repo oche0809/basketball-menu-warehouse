@@ -1,13 +1,12 @@
-import { BackupMenu } from './components/BackupMenu'
+import { BackupMenu, BackupReminder } from './components/BackupMenu'
 import { Layout } from './components/Layout'
 import { MenuForm } from './components/MenuForm'
 import { HomePage } from './pages/HomePage'
 import { MenuDetailPage } from './pages/MenuDetailPage'
 import { MenuListPage } from './pages/MenuListPage'
 import { PlanPage } from './pages/PlanPage'
-import { LogPage } from './pages/LogPage'
+import { lazy, Suspense } from 'react'
 import { RunPage } from './pages/RunPage'
-import { StudentViewPage } from './pages/StudentViewPage'
 import { SavedPlanDetail, SavedPlansList } from './pages/SavedPlansPage'
 import { usePracticePlan } from './utils/plan'
 import { planFromProposal } from './utils/aiPlan'
@@ -17,7 +16,16 @@ import type { SavedPlan } from './types/menu'
 import { navigate, useHashRoute } from './utils/router'
 import { useMenus } from './utils/storage'
 import { lastDoneMap, usePracticeLog } from './utils/practiceLog'
+import { usePlayers } from './utils/players'
 import { hasAnimation, hasBrokenAnimation } from './utils/animation'
+
+// あまり使わないページは、開いたときに読み込む（最初の読み込みを軽くする）
+const LogPage = lazy(() => import('./pages/LogPage').then((m) => ({ default: m.LogPage })))
+const PlayersPage = lazy(() => import('./pages/PlayersPage').then((m) => ({ default: m.PlayersPage })))
+const PlayerDetailPage = lazy(() => import('./pages/PlayersPage').then((m) => ({ default: m.PlayerDetailPage })))
+const StudentViewPage = lazy(() => import('./pages/StudentViewPage').then((m) => ({ default: m.StudentViewPage })))
+
+const Loading = () => <p className="py-16 text-center text-slate-500">読み込み中…</p>
 
 function NotFound() {
   return (
@@ -35,6 +43,7 @@ export default function App() {
   const session = usePracticeSession(planActions.items)
   const { savedPlans, savePlan, deleteSaved, toggleSavedFavorite, replaceSaved, importSaved } = useSavedPlans()
   const log = usePracticeLog()
+  const players = usePlayers()
 
   // 保存済み計画を現在の計画へコピーして、練習計画画面で確認・編集できるようにする
   const applySavedPlan = (saved: SavedPlan) => {
@@ -45,7 +54,12 @@ export default function App() {
   const [page = 'home', id] = segments
 
   // 生徒用ページ（見るだけ）。アプリのナビやバックアップは出さない
-  if (page === 'view') return <StudentViewPage code={params.get('d') ?? ''} />
+  if (page === 'view')
+    return (
+      <Suspense fallback={<Loading />}>
+        <StudentViewPage code={params.get('d') ?? ''} />
+      </Suspense>
+    )
 
   const menu = id ? menus.find((m) => m.id === id) : undefined
 
@@ -119,8 +133,13 @@ export default function App() {
     )
   } else if (page === 'plan' && id === 'run') {
     content = <RunPage plan={planActions.plan} menus={menus} session={session} log={log} />
+  } else if (page === 'players' && id) {
+    const player = players.players.find((p) => p.id === id)
+    content = player ? <PlayerDetailPage key={player.id} data={players} player={player} /> : <NotFound />
+  } else if (page === 'players') {
+    content = <PlayersPage key={params.get('tab') ?? ''} data={players} tab={params.get('tab')} />
   } else if (page === 'log') {
-    content = <LogPage entries={log.entries} menus={menus} onRemove={log.remove} />
+    content = <LogPage entries={log.entries} menus={menus} onRemove={log.remove} onAdd={log.addEntries} onUpdate={log.updateEntry} />
   } else if (page === 'plan') {
     content = (
       <PlanPage menus={menus} session={session} savedCount={savedPlans.length} onSavePlan={() => savePlan(planActions.getPlan(), menus)}
@@ -153,6 +172,7 @@ export default function App() {
         hasCurrentPlan={planActions.items.length > 0}
         onUse={() => applySavedPlan(saved)}
         onToggleFavorite={() => toggleSavedFavorite(saved.id)}
+        onRecord={log.addEntries}
         onDelete={() => {
           deleteSaved(saved.id)
           navigate('/saved')
@@ -176,19 +196,29 @@ export default function App() {
       plan={planActions.plan}
       savedPlans={savedPlans}
       practiceLog={log.entries}
+      playersData={{ players: players.players, tests: players.tests, records: players.records }}
       onImport={(data) => {
         replaceMenus(data.menus)
         if (data.plan) replacePlan(data.plan)
         if (data.savedPlans) replaceSaved(data.savedPlans)
         if (data.practiceLog) log.replaceLog(data.practiceLog)
+        if (data.playersData) players.replacePlayersData(data.playersData)
         navigate('/menus')
       }}
     />
   )
 
+  // ホームと練習計画の上に、バックアップのお知らせを出す
+  const reminder = (page === 'home' || (page === 'plan' && !id)) && (
+    <div className="mb-4">
+      <BackupReminder menus={menus} plan={planActions.plan} savedPlans={savedPlans} practiceLog={log.entries} playersData={{ players: players.players, tests: players.tests, records: players.records }} />
+    </div>
+  )
+
   return (
     <Layout current={page} actions={backup}>
-      {content}
+      {reminder}
+      <Suspense fallback={<Loading />}>{content}</Suspense>
     </Layout>
   )
 }
