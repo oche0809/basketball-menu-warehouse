@@ -2,8 +2,8 @@ import { useState, type FormEvent, type ReactNode } from 'react'
 import { CATEGORIES, DIFFICULTIES, SOURCE_TYPES, TARGET_LEVELS } from '../data/options'
 import type { MenuInput, PracticeMenu } from '../types/menu'
 
-// animation はフォームでは編集しない（編集しても元の値が残る）
-type FormState = Record<Exclude<keyof MenuInput, 'duration' | 'animation'>, string> & { duration: string }
+// animation・videos はフォームでは編集しない（編集しても元の値が残る）
+type FormState = Record<Exclude<keyof MenuInput, 'duration' | 'animation' | 'videos'>, string> & { duration: string }
 
 function toForm(menu?: PracticeMenu): FormState {
   return {

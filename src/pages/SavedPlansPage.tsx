@@ -3,6 +3,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog'
 import { ImportSharedDialog } from '../components/ImportSharedDialog'
 import { PrintPlan } from '../components/PrintPlan'
 import { ShareButton } from '../components/ShareButton'
+import { StudentLinkButton } from '../components/StudentLinkButton'
 import type { PracticeMenu, SavedPlan } from '../types/menu'
 import { ALL } from '../utils/filters'
 import { PLAN_TARGETS } from '../utils/plan'
@@ -240,7 +241,8 @@ export function SavedPlanDetail({ plan, menus, hasCurrentPlan, onUse, onDelete, 
           <a href="#/saved" className="inline-block py-2 font-medium text-orange-700 hover:underline">
             ← 保存済み一覧へ
           </a>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <StudentLinkButton getPlan={() => plan} menus={menus} />
             <ShareButton getText={() => buildShareText(plan, menus)} />
             <button
               type="button"

@@ -1,5 +1,7 @@
-import type { PracticeMenu, PracticePlan, SavedPlan } from '../types/menu'
+import type { PracticeLogEntry, PracticeMenu, PracticePlan, SavedPlan } from '../types/menu'
 import { normalizeAnimation } from './animation'
+import { normalizeLog } from './practiceLog'
+import { normalizeVideos } from './referenceVideos'
 import { normalizePlan, today } from './plan'
 import { normalizeSaved } from './savedPlans'
 
@@ -14,10 +16,10 @@ const LIST_KEYS = ['equipment', 'coachingPoints', 'commonMistakes', 'tags'] as c
 const SOURCE_KEYS = ['sourceType', 'sourceTitle', 'sourceUrl', 'sourceNote'] as const
 
 // plan・savedPlans を含まない古いファイルでは null（今の内容をそのまま残す）
-export type BackupData = { menus: PracticeMenu[]; plan: PracticePlan | null; savedPlans: SavedPlan[] | null }
+export type BackupData = { menus: PracticeMenu[]; plan: PracticePlan | null; savedPlans: SavedPlan[] | null; practiceLog: PracticeLogEntry[] | null }
 
-export function exportMenus(menus: PracticeMenu[], plan: PracticePlan, savedPlans: SavedPlan[]) {
-  const data = { app: APP_ID, version: 1, exportedAt: new Date().toISOString(), menus, plan, savedPlans }
+export function exportMenus(menus: PracticeMenu[], plan: PracticePlan, savedPlans: SavedPlan[], practiceLog: PracticeLogEntry[]) {
+  const data = { app: APP_ID, version: 1, exportedAt: new Date().toISOString(), menus, plan, savedPlans, practiceLog }
   const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
   const a = document.createElement('a')
   a.href = url
@@ -47,6 +49,9 @@ function toMenu(v: unknown): PracticeMenu | null {
   // 動きのアニメーション（任意）。旧形式にはない・壊れている場合は取り込まない
   const animation = normalizeAnimation(o.animation)
   if (animation) menu.animation = animation
+  // 先生が登録した参考動画（任意）。空の配列（＝表示しない）もそのまま残す
+  const videos = normalizeVideos(o.videos)
+  if (videos) menu.videos = videos
   return menu as PracticeMenu
 }
 
@@ -71,7 +76,9 @@ export function parseBackup(text: string): BackupData | null {
     const savedPlans = Array.isArray(data?.savedPlans)
       ? (data.savedPlans as unknown[]).map(normalizeSaved).filter((p): p is SavedPlan => p !== null)
       : null
-    return { menus: menus as PracticeMenu[], plan, savedPlans }
+    // 実施記録（旧形式にはないので null＝今の記録をそのまま残す）
+    const practiceLog = Array.isArray(data?.practiceLog) ? normalizeLog(data.practiceLog) : null
+    return { menus: menus as PracticeMenu[], plan, savedPlans, practiceLog }
   } catch {
     return null
   }

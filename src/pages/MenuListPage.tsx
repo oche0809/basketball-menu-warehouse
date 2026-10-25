@@ -4,7 +4,7 @@ import { AnimationManagerDialog } from '../components/AnimationManagerDialog'
 import { VideoMenuDialog } from '../components/VideoMenuDialog'
 import { CATEGORIES } from '../data/options'
 import type { MenuAnimation, MenuInput, PracticeMenu } from '../types/menu'
-import { ALL, DURATION_RANGES, EMPTY_CONDITIONS, PLAYER_RANGES, buildOptions, filterMenus, normalizeForSearch, type Conditions } from '../utils/filters'
+import { ALL, DURATION_RANGES, EMPTY_CONDITIONS, MEDIA_OPTIONS, PLAYER_RANGES, buildOptions, filterMenus, normalizeForSearch, type Conditions } from '../utils/filters'
 
 const POPULAR_TAG_COUNT = 12
 
@@ -101,6 +101,7 @@ export function MenuListPage({ menus, onToggleFavorite, favoritesOnly, initialCa
     { key: 'difficulty', label: '難易度', values: options.difficulty },
     { key: 'targetLevel', label: '対象レベル', values: options.targetLevel },
     { key: 'equipment', label: '必要な道具', values: options.equipment },
+    { key: 'media', label: '動き・動画', values: [...MEDIA_OPTIONS] },
   ]
 
   const clearAll = () => {
@@ -184,7 +185,7 @@ export function MenuListPage({ menus, onToggleFavorite, favoritesOnly, initialCa
         </button>
         {showConditions && (
           <div className="space-y-4 border-t border-slate-200 p-4">
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
               {conditionFields.map((f) => (
                 <label key={f.key} className="block space-y-1">
                   <span className="text-sm font-bold text-slate-700">{f.label}</span>

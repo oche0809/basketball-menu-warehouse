@@ -1,5 +1,7 @@
 import { DIFFICULTIES } from '../data/options'
 import type { PracticeMenu } from '../types/menu'
+import { hasAnimation } from './animation'
+import { hasVideos } from './referenceVideos'
 
 export const ALL = 'すべて'
 
@@ -20,7 +22,21 @@ export const DURATION_RANGES: Range[] = [
   { label: '31分以上', min: 31, max: Infinity },
 ]
 
+// 動きのアニメーション・参考動画があるかで絞り込む
+export const MEDIA_OPTIONS = ['🎬 動きあり', '📺 動画あり', '🎬📺 両方あり', 'どちらもなし'] as const
+
+function matchesMedia(m: PracticeMenu, media: string) {
+  if (media === ALL) return true
+  const a = hasAnimation(m)
+  const v = hasVideos(m)
+  if (media === MEDIA_OPTIONS[0]) return a
+  if (media === MEDIA_OPTIONS[1]) return v
+  if (media === MEDIA_OPTIONS[2]) return a && v
+  return !a && !v
+}
+
 export type Conditions = {
+  media: string
   players: string
   duration: string
   difficulty: string
@@ -31,6 +47,7 @@ export type Conditions = {
 }
 
 export const EMPTY_CONDITIONS: Conditions = {
+  media: ALL,
   players: ALL,
   duration: ALL,
   difficulty: ALL,
@@ -88,7 +105,8 @@ function matchesConditions(m: PracticeMenu, c: Conditions) {
     (c.difficulty === ALL || m.difficulty === c.difficulty) &&
     (c.targetLevel === ALL || m.targetLevel === c.targetLevel) &&
     (c.equipment === ALL || m.equipment.some((e) => equipmentName(e) === c.equipment)) &&
-    c.tags.every((t) => m.tags.includes(t))
+    c.tags.every((t) => m.tags.includes(t)) &&
+    matchesMedia(m, c.media)
   )
 }
 

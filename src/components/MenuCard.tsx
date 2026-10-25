@@ -1,4 +1,6 @@
 import type { PracticeMenu } from '../types/menu'
+import { hasAnimation } from '../utils/animation'
+import { hasVideos } from '../utils/referenceVideos'
 
 const DIFFICULTY_STYLE: Record<string, string> = {
   初級: 'bg-emerald-50 text-emerald-700',
@@ -38,7 +40,11 @@ export function MenuCard({ menu, onToggleFavorite }: { menu: PracticeMenu; onTog
     <article className="relative flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-orange-300 hover:shadow">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 space-y-2">
-          <Badges menu={menu} />
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Badges menu={menu} />
+            {hasAnimation(menu) && <span className="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700">🎬 動き</span>}
+            {hasVideos(menu) && <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700">📺 動画</span>}
+          </div>
           <h3 className="text-lg font-bold leading-snug">
             <a href={`#/menus/${menu.id}`} className="after:absolute after:inset-0">
               {menu.title}

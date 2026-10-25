@@ -25,7 +25,12 @@ export type PracticeMenu = {
   sourceNote?: string
   // 🎬 動きの解説アニメーション（任意）。出典とは別の情報
   animation?: MenuAnimation
+  // 📺 参考動画（任意）。先生が追加・差し替えたもの。ある場合は公式の参考動画の代わりに表示する（空配列＝表示しない）
+  videos?: MenuVideo[]
 }
+
+// 参考動画（公式・先生が追加したもの共通）
+export type MenuVideo = { title: string; channel?: string; url: string }
 
 // ---- 動きの解説アニメーション（ハーフコート） ----
 // 座標は画面サイズに依存しない 0〜100。x：左→右、y：上（エンドライン・ゴール側）→下（ハーフライン）
@@ -112,4 +117,18 @@ export type AIPlanConditions = {
 export type AIPlanProposal = {
   summary: string
   items: { menuId: string; duration: number; reason: string }[]
+}
+
+// 実施記録（練習実施画面で「実施済み」にしたメニュー）。同じ練習日の同じ項目は1件だけ
+export type PracticeLogEntry = {
+  id: string
+  date: string
+  itemId: string
+  menuId: string
+  // 記録した時点のメニュー名・カテゴリ（倉庫から消えても表示できるように）
+  title: string
+  category: string
+  duration: number
+  planTitle: string
+  recordedAt: string
 }

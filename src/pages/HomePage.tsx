@@ -29,6 +29,13 @@ export function HomePage({ menus }: { menus: PracticeMenu[] }) {
           <div className="text-sm text-slate-500">お気に入り</div>
           <div className="text-3xl font-bold text-rose-500">{favoriteCount}<span className="ml-1 text-base font-normal text-slate-800">件</span></div>
         </a>
+        <a href="#/log" className="col-span-2 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 hover:border-orange-300">
+          <span>
+            <span className="block font-bold">📊 実施記録・偏りチェック</span>
+            <span className="text-sm text-slate-500">最近やった練習と、足りないカテゴリを確認</span>
+          </span>
+          <span className="text-orange-700">→</span>
+        </a>
       </section>
 
       <div className="grid gap-8 lg:grid-cols-2">

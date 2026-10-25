@@ -5,7 +5,9 @@ import { HomePage } from './pages/HomePage'
 import { MenuDetailPage } from './pages/MenuDetailPage'
 import { MenuListPage } from './pages/MenuListPage'
 import { PlanPage } from './pages/PlanPage'
+import { LogPage } from './pages/LogPage'
 import { RunPage } from './pages/RunPage'
+import { StudentViewPage } from './pages/StudentViewPage'
 import { SavedPlanDetail, SavedPlansList } from './pages/SavedPlansPage'
 import { usePracticePlan } from './utils/plan'
 import { planFromProposal } from './utils/aiPlan'
@@ -14,6 +16,7 @@ import { usePracticeSession } from './utils/session'
 import type { SavedPlan } from './types/menu'
 import { navigate, useHashRoute } from './utils/router'
 import { useMenus } from './utils/storage'
+import { lastDoneMap, usePracticeLog } from './utils/practiceLog'
 import { hasAnimation, hasBrokenAnimation } from './utils/animation'
 
 function NotFound() {
@@ -31,6 +34,7 @@ export default function App() {
   const { replacePlan, ...planActions } = usePracticePlan(menus)
   const session = usePracticeSession(planActions.items)
   const { savedPlans, savePlan, deleteSaved, toggleSavedFavorite, replaceSaved, importSaved } = useSavedPlans()
+  const log = usePracticeLog()
 
   // 保存済み計画を現在の計画へコピーして、練習計画画面で確認・編集できるようにする
   const applySavedPlan = (saved: SavedPlan) => {
@@ -39,6 +43,10 @@ export default function App() {
     navigate('/plan')
   }
   const [page = 'home', id] = segments
+
+  // 生徒用ページ（見るだけ）。アプリのナビやバックアップは出さない
+  if (page === 'view') return <StudentViewPage code={params.get('d') ?? ''} />
+
   const menu = id ? menus.find((m) => m.id === id) : undefined
 
   let content
@@ -49,6 +57,8 @@ export default function App() {
         menu={menu}
         onToggleFavorite={toggleFavorite}
         onSaveAnimation={(menuId, animation) => updateMenu(menuId, { animation })}
+        onSaveVideos={(menuId, videos) => updateMenu(menuId, { videos })}
+        practiceInfo={lastDoneMap(log.entries).get(menu.id)}
         onDelete={(menuId) => {
           deleteMenu(menuId)
           navigate('/menus')
@@ -108,7 +118,9 @@ export default function App() {
       <NotFound />
     )
   } else if (page === 'plan' && id === 'run') {
-    content = <RunPage plan={planActions.plan} menus={menus} session={session} />
+    content = <RunPage plan={planActions.plan} menus={menus} session={session} log={log} />
+  } else if (page === 'log') {
+    content = <LogPage entries={log.entries} menus={menus} onRemove={log.remove} />
   } else if (page === 'plan') {
     content = (
       <PlanPage menus={menus} session={session} savedCount={savedPlans.length} onSavePlan={() => savePlan(planActions.getPlan(), menus)}
@@ -163,10 +175,12 @@ export default function App() {
       menus={menus}
       plan={planActions.plan}
       savedPlans={savedPlans}
+      practiceLog={log.entries}
       onImport={(data) => {
         replaceMenus(data.menus)
         if (data.plan) replacePlan(data.plan)
         if (data.savedPlans) replaceSaved(data.savedPlans)
+        if (data.practiceLog) log.replaceLog(data.practiceLog)
         navigate('/menus')
       }}
     />

@@ -6,6 +6,7 @@ const NAV = [
   { key: 'favorites', href: '#/favorites', label: 'お気に入り', icon: '♥' },
   { key: 'plan', href: '#/plan', label: '練習計画', icon: '📝' },
   { key: 'saved', href: '#/saved', label: '保存済み', icon: '📚' },
+  { key: 'log', href: '#/log', label: '実施記録', icon: '📊' },
   { key: 'new', href: '#/new', label: '追加', icon: '＋' },
 ]
 
@@ -45,11 +46,11 @@ export function Layout({ current, actions, children }: { current: string; action
         className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t border-slate-200 bg-white md:hidden print:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {NAV.filter((n) => n.key !== 'saved').map((n) => (
+        {NAV.filter((n) => n.key !== 'saved' && n.key !== 'log').map((n) => (
           <a
             key={n.key}
             href={n.href}
-            className={`flex min-h-16 flex-col items-center justify-center gap-1 text-xs font-bold ${current === n.key || (n.key === 'plan' && current === 'saved') ? 'text-orange-600' : 'text-slate-500'}`}
+            className={`flex min-h-16 flex-col items-center justify-center gap-1 text-xs font-bold ${current === n.key || (n.key === 'plan' && (current === 'saved' || current === 'log')) ? 'text-orange-600' : 'text-slate-500'}`}
           >
             <span className="text-2xl leading-none">{n.icon}</span>
             {n.label}

@@ -1,16 +1,25 @@
 import { useState } from 'react'
 import { ConfirmDialog } from '../components/ConfirmDialog'
+import { MenuAnimationDialog } from '../components/MenuAnimationDialog'
+import { VideosDialog } from '../components/ReferenceVideos'
 import type { PracticeMenu, PracticePlan } from '../types/menu'
+import { getMenuAnimation } from '../utils/animation'
+import type { PracticeLogActions } from '../utils/practiceLog'
+import { getMenuVideos } from '../utils/referenceVideos'
 import type { SessionActions } from '../utils/session'
 import { TimeSummary, formatDate } from './PlanPage'
 
 const navButton =
   'h-14 rounded-xl border border-slate-300 bg-white text-lg font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30'
 
-type Props = { plan: PracticePlan; menus: PracticeMenu[]; session: SessionActions }
+type Props = { plan: PracticePlan; menus: PracticeMenu[]; session: SessionActions; log: Pick<PracticeLogActions, 'record' | 'unrecord'> }
 
-export function RunPage({ plan, menus, session }: Props) {
+const mediaButton = 'inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border px-4 font-bold sm:flex-none'
+
+export function RunPage({ plan, menus, session, log }: Props) {
   const [confirming, setConfirming] = useState(false)
+  const [showAnimation, setShowAnimation] = useState(false)
+  const [showVideos, setShowVideos] = useState(false)
   const { items } = plan
   const menuMap = new Map(menus.map((m) => [m.id, m]))
   const total = items.reduce((sum, i) => sum + i.duration, 0)
@@ -19,6 +28,18 @@ export function RunPage({ plan, menus, session }: Props) {
   const menu = current && menuMap.get(current.menuId)
   const isDone = current ? completedIds.has(current.id) : false
   const finished = allDone && currentIndex === -1
+  const animation = menu ? getMenuAnimation(menu) : null
+  const videos = menu ? getMenuVideos(menu).videos : []
+
+  // 実施済みにすると実施記録にも残す（取り消すと記録も消す）
+  const complete = () => {
+    if (current) log.record(plan, current, menu)
+    session.complete()
+  }
+  const uncomplete = () => {
+    if (current) log.unrecord(plan, current)
+    session.uncomplete()
+  }
 
   if (items.length === 0) {
     return (
@@ -94,10 +115,14 @@ export function RunPage({ plan, menus, session }: Props) {
         <section className="rounded-xl border border-emerald-300 bg-emerald-50 p-6 text-center">
           <p className="text-2xl font-bold text-emerald-800">🏁 練習完了</p>
           <p className="mt-2 text-emerald-800">全{items.length}メニューを実施しました。</p>
-          <div className="mt-6 grid gap-2 sm:grid-cols-2">
+          <p className="mt-1 text-sm text-emerald-700">実施したメニューは「📊 実施記録」に残っています。</p>
+          <div className="mt-6 grid gap-2 sm:grid-cols-3">
             <button type="button" onClick={session.prev} className={navButton}>
               最後のメニューを見る
             </button>
+            <a href="#/log" className={`${navButton} grid place-items-center`}>
+              📊 実施記録を見る
+            </a>
             <a href="#/plan" className={`${navButton} grid place-items-center`}>
               練習計画に戻る
             </a>
@@ -118,6 +143,20 @@ export function RunPage({ plan, menus, session }: Props) {
                   <span className="text-base">分</span>
                 </p>
               </div>
+              {(animation || videos.length > 0) && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {animation && (
+                    <button type="button" onClick={() => setShowAnimation(true)} className={`${mediaButton} border-sky-300 bg-sky-50 text-sky-800 hover:bg-sky-100`}>
+                      🎬 動きを見る
+                    </button>
+                  )}
+                  {videos.length > 0 && (
+                    <button type="button" onClick={() => setShowVideos(true)} className={`${mediaButton} border-red-300 bg-red-50 text-red-800 hover:bg-red-100`}>
+                      📺 参考動画{videos.length > 1 ? `（${videos.length}本）` : ''}
+                    </button>
+                  )}
+                </div>
+              )}
               {menu && menu.coachingPoints.length > 0 && (
                 <div className="mt-4">
                   <h3 className="text-sm font-bold text-slate-500">指導ポイント</h3>
@@ -146,11 +185,11 @@ export function RunPage({ plan, menus, session }: Props) {
               style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom))' }}
             >
               {isDone ? (
-                <button type="button" onClick={session.uncomplete} className="h-14 w-full rounded-xl border border-emerald-300 bg-white text-lg font-bold text-emerald-700">
+                <button type="button" onClick={uncomplete} className="h-14 w-full rounded-xl border border-emerald-300 bg-white text-lg font-bold text-emerald-700">
                   実施済みを取り消す
                 </button>
               ) : (
-                <button type="button" onClick={session.complete} className="h-14 w-full rounded-xl bg-emerald-600 text-lg font-bold text-white hover:bg-emerald-700">
+                <button type="button" onClick={complete} className="h-14 w-full rounded-xl bg-emerald-600 text-lg font-bold text-white hover:bg-emerald-700">
                   ✓ 実施済みにする
                 </button>
               )}
@@ -167,10 +206,13 @@ export function RunPage({ plan, menus, session }: Props) {
         )
       )}
 
+      {showAnimation && animation && menu && <MenuAnimationDialog title={menu.title} animation={animation} onClose={() => setShowAnimation(false)} />}
+      {showVideos && menu && <VideosDialog title={menu.title} videos={videos} onClose={() => setShowVideos(false)} />}
+
       <ConfirmDialog
         open={confirming}
         message="今回の実施状態をリセットしますか？"
-        note="練習計画そのものは削除されません。"
+        note="練習計画と実施記録は削除されません。"
         confirmLabel="リセット"
         onCancel={() => setConfirming(false)}
         onConfirm={() => {

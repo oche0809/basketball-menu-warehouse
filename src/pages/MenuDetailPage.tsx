@@ -3,9 +3,11 @@ import { AnimationGenerateDialog } from '../components/AnimationGenerateDialog'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { MenuAnimationDialog } from '../components/MenuAnimationDialog'
 import { Badges, FavoriteButton } from '../components/MenuCard'
-import type { MenuAnimation, PracticeMenu } from '../types/menu'
+import type { MenuAnimation, MenuVideo, PracticeMenu } from '../types/menu'
 import { getMenuAnimation } from '../utils/animation'
-import { getReferenceVideos, youtubeId, type ReferenceVideo } from '../utils/referenceVideos'
+import { VIDEO_NOTE, VideoEditorDialog, VideoList } from '../components/ReferenceVideos'
+import { getMenuVideos, getReferenceVideos } from '../utils/referenceVideos'
+import { formatDate } from './PlanPage'
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -54,61 +56,41 @@ function SourceSection({ menu }: { menu: PracticeMenu }) {
   )
 }
 
-// 参考動画。最初はサムネイルだけを出し、押したときだけ YouTube を読み込む（通信量を抑える）
-function VideoItem({ video }: { video: ReferenceVideo }) {
-  const [playing, setPlaying] = useState(false)
-  const id = youtubeId(video.url)
-  return (
-    <li className="space-y-2">
-      {id &&
-        (playing ? (
-          <div className="aspect-video overflow-hidden rounded-lg bg-black">
-            <iframe
-              src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`}
-              title={video.title}
-              className="h-full w-full"
-              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-              allowFullScreen
-            />
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setPlaying(true)}
-            className="group relative block aspect-video w-full overflow-hidden rounded-lg bg-slate-200"
-            aria-label={`「${video.title}」をここで再生`}
-          >
-            <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" className="h-full w-full object-cover" />
-            <span className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30">
-              <span className="rounded-full bg-red-600 px-5 py-2 text-lg font-bold text-white shadow">▶ 再生</span>
-            </span>
-          </button>
-        ))}
-      <p className="font-bold break-words">{video.title}</p>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-slate-500">{video.channel}</p>
-        <a
-          href={video.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex min-h-11 items-center rounded-lg border border-orange-300 bg-white px-4 font-bold text-orange-700 hover:bg-orange-50"
-        >
-          YouTubeで開く ↗
-        </a>
-      </div>
-    </li>
-  )
-}
-
-function ReferenceVideoSection({ menuId }: { menuId: string }) {
-  const videos = getReferenceVideos(menuId)
-  if (videos.length === 0) return null
+function ReferenceVideoSection({ menu, onSave }: { menu: PracticeMenu; onSave: (videos: MenuVideo[] | undefined) => void }) {
+  const [editing, setEditing] = useState(false)
+  const { videos, source } = getMenuVideos(menu)
+  const official = getReferenceVideos(menu.id)
   return (
     <Section title="📺 参考動画">
-      <p className="mb-3 text-sm text-slate-500">似た練習やコツを解説している動画です。メニューの内容と完全に同じとは限りません。</p>
-      <ul className="space-y-4">
-        {videos.map((v) => <VideoItem key={v.url} video={v} />)}
-      </ul>
+      {videos.length > 0 ? (
+        <>
+          <p className="mb-3 text-sm text-slate-500">
+            {source === 'personal' ? '先生が登録した動画です。' : VIDEO_NOTE}
+          </p>
+          <VideoList videos={videos} />
+        </>
+      ) : (
+        <p className="text-sm text-slate-500">参考動画はまだありません。</p>
+      )}
+      <button
+        type="button"
+        onClick={() => setEditing(true)}
+        className="mt-4 inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-4 font-bold text-slate-700 hover:bg-slate-50"
+      >
+        {videos.length > 0 ? '✏️ 動画を追加・差し替え' : '＋ 動画を追加'}
+      </button>
+      {editing && (
+        <VideoEditorDialog
+          initial={videos}
+          personal={source === 'personal'}
+          hasOfficial={official.length > 0}
+          onSave={(list) => {
+            onSave(list)
+            setEditing(false)
+          }}
+          onClose={() => setEditing(false)}
+        />
+      )}
     </Section>
   )
 }
@@ -118,9 +100,12 @@ type Props = {
   onToggleFavorite: (id: string) => void
   onDelete: (id: string) => void
   onSaveAnimation: (id: string, animation: MenuAnimation) => void
+  onSaveVideos: (id: string, videos: MenuVideo[] | undefined) => void
+  // 実施記録から：最後に実施した日と回数
+  practiceInfo?: { date: string; count: number }
 }
 
-export function MenuDetailPage({ menu, onToggleFavorite, onDelete, onSaveAnimation }: Props) {
+export function MenuDetailPage({ menu, onToggleFavorite, onDelete, onSaveAnimation, onSaveVideos, practiceInfo }: Props) {
   const [confirming, setConfirming] = useState(false)
   const [showAnimation, setShowAnimation] = useState(false)
   const [generating, setGenerating] = useState(false)
@@ -146,6 +131,9 @@ export function MenuDetailPage({ menu, onToggleFavorite, onDelete, onSaveAnimati
           <div className="space-y-2">
             <Badges menu={menu} />
             <h1 className="text-2xl font-bold sm:text-3xl">{menu.title}</h1>
+            <p className="text-sm text-slate-500">
+              📊 {practiceInfo ? `最後に実施：${formatDate(practiceInfo.date)}（記録 ${practiceInfo.count}回）` : 'まだ実施記録はありません'}
+            </p>
           </div>
           <FavoriteButton active={menu.favorite} onClick={() => onToggleFavorite(menu.id)} />
         </div>
@@ -211,7 +199,7 @@ export function MenuDetailPage({ menu, onToggleFavorite, onDelete, onSaveAnimati
           {menu.regression && <Section title="簡単にする方法"><Text value={menu.regression} /></Section>}
         </div>
       </div>
-      <ReferenceVideoSection menuId={menu.id} />
+      <ReferenceVideoSection menu={menu} onSave={(videos) => onSaveVideos(menu.id, videos)} />
       <SourceSection menu={menu} />
       {menu.tags.length > 0 && (
         <div className="flex flex-wrap gap-2">

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
-import type { PracticeMenu, PracticePlan, SavedPlan } from '../types/menu'
+import type { PracticeLogEntry, PracticeMenu, PracticePlan, SavedPlan } from '../types/menu'
 import { exportMenus, parseBackup, type BackupData } from '../utils/backup'
 import { ConfirmDialog } from './ConfirmDialog'
 
-type Props = { menus: PracticeMenu[]; plan: PracticePlan; savedPlans: SavedPlan[]; onImport: (data: BackupData) => void }
+type Props = { menus: PracticeMenu[]; plan: PracticePlan; savedPlans: SavedPlan[]; practiceLog: PracticeLogEntry[]; onImport: (data: BackupData) => void }
 
-export function BackupMenu({ menus, plan, savedPlans, onImport }: Props) {
+export function BackupMenu({ menus, plan, savedPlans, practiceLog, onImport }: Props) {
   const [open, setOpen] = useState(false)
   const [pending, setPending] = useState<BackupData | null>(null)
   const [notice, setNotice] = useState<{ text: string; error?: boolean } | null>(null)
@@ -56,7 +56,7 @@ export function BackupMenu({ menus, plan, savedPlans, onImport }: Props) {
               type="button"
               className={itemClass}
               onClick={() => {
-                exportMenus(menus, plan, savedPlans)
+                exportMenus(menus, plan, savedPlans, practiceLog)
                 setOpen(false)
                 setNotice({ text: `${menus.length}件のメニューを書き出しました。` })
               }}
@@ -83,7 +83,7 @@ export function BackupMenu({ menus, plan, savedPlans, onImport }: Props) {
       <ConfirmDialog
         open={pending !== null}
         message={'現在保存されているメニューを、読み込んだデータで置き換えます。\nよろしいですか？'}
-        note={`読み込むメニュー：${pending?.menus.length ?? 0}件（現在：${menus.length}件）${pending?.plan ? `／練習計画：${pending.plan.items.length}件` : ''}${pending?.savedPlans ? `／保存済み計画：${pending.savedPlans.length}件` : ''}`}
+        note={`読み込むメニュー：${pending?.menus.length ?? 0}件（現在：${menus.length}件）${pending?.plan ? `／練習計画：${pending.plan.items.length}件` : ''}${pending?.savedPlans ? `／保存済み計画：${pending.savedPlans.length}件` : ''}${pending?.practiceLog ? `／実施記録：${pending.practiceLog.length}件` : ''}`}
         confirmLabel="読み込む"
         onCancel={() => setPending(null)}
         onConfirm={() => {
