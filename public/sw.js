@@ -42,7 +42,8 @@ async function pruneAssets(cache, html) {
 async function handlePage(request) {
   const cache = await caches.open(CACHE)
   try {
-    const res = await fetch(request)
+    // ブラウザの HTTP キャッシュ（GitHub Pages は最大10分）を使わず、毎回最新かを確かめる（更新がすぐ届くように）
+    const res = await fetch(request.url, { cache: 'no-cache', credentials: 'same-origin' })
     if (res.ok) {
       await cache.put(INDEX, res.clone())
       pruneAssets(cache, await res.clone().text())
