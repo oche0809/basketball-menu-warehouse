@@ -24,14 +24,15 @@ export function Layout({ current, actions, children }: { current: string; action
           <nav className="ml-auto hidden items-center gap-1 md:flex">
             {NAV.map((n) =>
               n.key === 'new' ? (
-                <a key={n.key} href={n.href} className="ml-2 rounded-lg bg-orange-600 px-4 py-2 font-bold text-white hover:bg-orange-700">
-                  ＋ メニューを追加
+                <a key={n.key} href={n.href} className="ml-2 rounded-lg bg-orange-600 px-3 py-2 font-bold whitespace-nowrap text-white hover:bg-orange-700 xl:px-4">
+                  {/* 画面が狭いときは短く表示して、ナビが2行に折り返さないようにする */}
+                  ＋ <span className="hidden xl:inline">メニューを</span>追加
                 </a>
               ) : (
                 <a
                   key={n.key}
                   href={n.href}
-                  className={`rounded-lg px-3 py-2 font-medium ${current === n.key ? 'bg-orange-50 text-orange-700' : 'text-slate-600 hover:bg-slate-100'}`}
+                  className={`rounded-lg px-2 py-2 font-medium whitespace-nowrap lg:px-3 ${current === n.key ? 'bg-orange-50 text-orange-700' : 'text-slate-600 hover:bg-slate-100'}`}
                 >
                   {n.label}
                 </a>
