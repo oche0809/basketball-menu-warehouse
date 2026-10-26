@@ -6,6 +6,7 @@ import { ShareButton } from '../components/ShareButton'
 import { RecordSavedPlanDialog } from '../components/LogDialogs'
 import type { PracticeLogActions } from '../utils/practiceLog'
 import { StudentLinkButton } from '../components/StudentLinkButton'
+import { TeamPublishButton } from '../components/TeamPublishButton'
 import type { PracticeMenu, SavedPlan } from '../types/menu'
 import { ALL } from '../utils/filters'
 import { PLAN_TARGETS } from '../utils/plan'
@@ -256,6 +257,7 @@ export function SavedPlanDetail({ plan, menus, hasCurrentPlan, onUse, onDelete, 
             >
               {recorded > 0 ? `✓ ${recorded}件を記録しました` : '📊 実施記録に追加'}
             </button>
+            <TeamPublishButton getPlan={() => plan} menus={menus} />
             <StudentLinkButton getPlan={() => plan} menus={menus} />
             <ShareButton getText={() => buildShareText(plan, menus)} />
             <button

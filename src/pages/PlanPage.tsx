@@ -5,6 +5,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog'
 import { PrintPlan } from '../components/PrintPlan'
 import { ShareButton } from '../components/ShareButton'
 import { StudentLinkButton } from '../components/StudentLinkButton'
+import { TeamPublishButton } from '../components/TeamPublishButton'
 import type { AIPlanConditions, AIPlanProposal, PracticeMenu } from '../types/menu'
 import { ALL, EMPTY_CONDITIONS, filterMenus } from '../utils/filters'
 import { PLAN_TARGETS, type PlanActions } from '../utils/plan'
@@ -375,6 +376,15 @@ export function PlanPage({
               📊 実施記録
             </a>
             <div className="flex flex-wrap items-center justify-end gap-2">
+              <TeamPublishButton
+                disabled={rows.length === 0}
+                menus={menus}
+                getPlan={() => {
+                  const el = document.activeElement
+                  if (el instanceof HTMLElement) flushSync(() => el.blur())
+                  return getPlan()
+                }}
+              />
               <StudentLinkButton
                 disabled={rows.length === 0}
                 menus={menus}

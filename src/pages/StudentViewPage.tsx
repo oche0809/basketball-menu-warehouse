@@ -8,7 +8,7 @@ import { getReferenceVideos } from '../utils/referenceVideos'
 import { decodeStudentPlan, type StudentItem, type StudentPlan } from '../utils/studentView'
 import { formatDate } from '../utils/format'
 
-function ItemCard({ item, index }: { item: StudentItem; index: number }) {
+export function ItemCard({ item, index }: { item: StudentItem; index: number }) {
   const [showAnimation, setShowAnimation] = useState(false)
   const [showVideos, setShowVideos] = useState(false)
   const { menu } = item

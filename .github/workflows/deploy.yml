@@ -1,9 +1,13 @@
-# main に push すると、ビルドして GitHub Pages に公開する
+# main に push すると、ビルドして GitHub Pages に公開する。
+# 先生がアプリの「チームページに公開」を押したとき（repository_dispatch: team-board）も、
+# team-board ブランチの予定（team-board.json）を入れて公開し直す
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches: ['main']
+  repository_dispatch:
+    types: ['team-board']
   workflow_dispatch:
 
 permissions:
@@ -42,6 +46,13 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # チームページの予定。まだ一度も公開していなければ入れない（アプリは「まだありません」と表示する）
+      - name: Add team board
+        run: |
+          if git fetch --depth=1 origin team-board; then
+            git show FETCH_HEAD:team-board.json > dist/team-board.json
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v6

@@ -24,6 +24,7 @@ const LogPage = lazy(() => import('./pages/LogPage').then((m) => ({ default: m.L
 const PlayersPage = lazy(() => import('./pages/PlayersPage').then((m) => ({ default: m.PlayersPage })))
 const PlayerDetailPage = lazy(() => import('./pages/PlayersPage').then((m) => ({ default: m.PlayerDetailPage })))
 const StudentViewPage = lazy(() => import('./pages/StudentViewPage').then((m) => ({ default: m.StudentViewPage })))
+const TeamBoardPage = lazy(() => import('./pages/TeamBoardPage').then((m) => ({ default: m.TeamBoardPage })))
 
 const Loading = () => <p className="py-16 text-center text-slate-500">読み込み中…</p>
 
@@ -58,6 +59,13 @@ export default function App() {
     return (
       <Suspense fallback={<Loading />}>
         <StudentViewPage code={params.get('d') ?? ''} />
+      </Suspense>
+    )
+  // チームページ（見るだけ・URL は固定）
+  if (page === 'team')
+    return (
+      <Suspense fallback={<Loading />}>
+        <TeamBoardPage />
       </Suspense>
     )
 

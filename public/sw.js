@@ -1,6 +1,7 @@
 // オフライン対応（Service Worker）。一度インターネットにつながった状態で開くと、アプリ本体をこの端末に保存し、
 // 電波がないときでもメニュー・動き・練習計画・実施記録を開けるようにする（YouTube の動画は通信が必要）。
 // ・ページ本体（index.html）：まずネットから最新を取り、つながらなければ保存したものを使う
+// ・チームページの予定（team-board.json）：ページ本体と同じく、まずネットから最新を取る
 // ・JS・CSS など（ファイル名に版が入っている）：保存したものを使い、なければネットから取って保存する
 const CACHE = 'bmw-app-v2'
 const SCOPE = new URL(self.registration.scope)
@@ -82,6 +83,19 @@ async function handleAsset(request) {
   return res
 }
 
+// チームページの予定（team-board.json）：いつも最新を取りにいき、電波がないときだけ前に取ったものを使う
+async function handleBoard(request) {
+  const cache = await caches.open(CACHE)
+  const key = new URL('team-board.json', SCOPE).href
+  try {
+    const res = await fetch(request)
+    if (res.ok) await cache.put(key, res.clone())
+    return res
+  } catch {
+    return (await cache.match(key)) ?? Response.error()
+  }
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event
   if (request.method !== 'GET') return
@@ -89,5 +103,6 @@ self.addEventListener('fetch', (event) => {
   // 自分のサイト以外（YouTube・サムネイルなど）は保存しない
   if (url.origin !== SCOPE.origin || !url.pathname.startsWith(SCOPE.pathname)) return
   if (request.mode === 'navigate') event.respondWith(handlePage(request))
+  else if (url.pathname.endsWith('/team-board.json')) event.respondWith(handleBoard(request))
   else event.respondWith(handleAsset(request))
 })

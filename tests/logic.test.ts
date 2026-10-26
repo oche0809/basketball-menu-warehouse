@@ -7,6 +7,7 @@ import { analyzeLog, normalizeLog } from '../src/utils/practiceLog'
 import { bestOf, normalizeRecords } from '../src/utils/players'
 import { getMenuVideos, normalizeVideos, youtubeId } from '../src/utils/referenceVideos'
 import { decodeStudentPlan, encodeStudentPlan } from '../src/utils/studentView'
+import { EMPTY_BOARD, normalizeBoard, publishToBoard, removeFromBoard, splitBoard } from '../src/utils/teamBoard'
 
 const sample = createSampleMenus()
 const custom: PracticeMenu = {
@@ -80,6 +81,59 @@ describe('生徒用リンク', () => {
   it('壊れたリンクは null', async () => {
     expect(await decodeStudentPlan('zこわれた')).toBeNull()
     expect(await decodeStudentPlan('')).toBeNull()
+  })
+})
+
+describe('チームページ', () => {
+  const plan = (date: string, title: string): PracticePlan => ({
+    title,
+    date,
+    target: '全員',
+    players: 10,
+    plannedDuration: 60,
+    items: [
+      { id: 'a', menuId: sample[0].id, duration: 10, note: '秘密のメモ' },
+      { id: 'b', menuId: 'custom-1', duration: 15 },
+    ],
+  })
+
+  it('同じ日に公開し直すと置き換わり、日付順に並ぶ', () => {
+    let board = publishToBoard(EMPTY_BOARD, plan('2026-10-28', '水曜'), menus, false)
+    board = publishToBoard(board, plan('2026-10-27', '火曜'), menus, false)
+    board = publishToBoard(board, plan('2026-10-28', '水曜（変更）'), menus, false)
+    expect(board.plans.map((e) => [e.date, e.plan.t])).toEqual([
+      ['2026-10-27', '火曜'],
+      ['2026-10-28', '水曜（変更）'],
+    ])
+    expect(removeFromBoard(board, '2026-10-27').plans.map((e) => e.date)).toEqual(['2026-10-28'])
+  })
+
+  it('メモはチェックしたときだけ載り、オリジナルメニューの中身も届く', () => {
+    const [hidden] = splitBoard(publishToBoard(EMPTY_BOARD, plan('2026-10-28', 'x'), menus, false), '2026-10-01').upcoming
+    expect(hidden.items[0].note).toBeUndefined()
+    expect(hidden.items[1].menu?.title).toBe('先生のオリジナル')
+    const [shown] = splitBoard(publishToBoard(EMPTY_BOARD, plan('2026-10-28', 'x'), menus, true), '2026-10-01').upcoming
+    expect(shown.items[0].note).toBe('秘密のメモ')
+  })
+
+  it('今日以降は近い順、終わった練習は新しい順', () => {
+    let board = EMPTY_BOARD
+    for (const d of ['2026-10-20', '2026-10-24', '2026-10-26', '2026-10-30']) board = publishToBoard(board, plan(d, d), menus, false)
+    const { upcoming, past } = splitBoard(board, '2026-10-26')
+    expect(upcoming.map((p) => p.date)).toEqual(['2026-10-26', '2026-10-30'])
+    expect(past.map((p) => p.date)).toEqual(['2026-10-24', '2026-10-20'])
+  })
+
+  it('古いものから消して30件までにする', () => {
+    let board = EMPTY_BOARD
+    for (let i = 1; i <= 31; i++) board = publishToBoard(board, plan(`2026-10-${String(i).padStart(2, '0')}`, ''), menus, false)
+    expect(board.plans).toHaveLength(30)
+    expect(board.plans[0].date).toBe('2026-10-02')
+  })
+
+  it('形の崩れたファイルは空として扱う', () => {
+    expect(normalizeBoard(null).plans).toEqual([])
+    expect(normalizeBoard({ v: 1, plans: [{ date: 'x' }, { date: '2026-10-01', plan: { v: 2 } }] }).plans).toEqual([])
   })
 })
 

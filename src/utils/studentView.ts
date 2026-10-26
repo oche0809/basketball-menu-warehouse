@@ -27,7 +27,7 @@ export type StudentItem = { menuId: string; duration: number; note?: string; men
 export type StudentPlan = { title: string; date: string; items: StudentItem[] }
 
 type PayloadItem = { m: string; d: number; n?: string; c?: Partial<StudentMenu>; a?: MenuAnimation; v?: MenuVideo[] }
-type Payload = { v: 1; t: string; d: string; i: PayloadItem[] }
+export type StudentPayload = { v: 1; t: string; d: string; i: PayloadItem[] }
 
 let officialCache: Map<string, PracticeMenu> | null = null
 function officialMenus() {
@@ -46,7 +46,8 @@ const toStudentMenu = (m: PracticeMenu): StudentMenu => ({
   coachingPoints: m.coachingPoints,
 })
 
-function buildPayload(plan: PracticePlan, menus: PracticeMenu[], withNotes: boolean): Payload {
+// チームページ（teamBoard.ts）でも同じ形で保存する
+export function buildStudentPayload(plan: PracticePlan, menus: PracticeMenu[], withNotes: boolean): StudentPayload {
   const menuMap = new Map(menus.map((m) => [m.id, m]))
   const official = officialMenus()
   const items = plan.items.flatMap((item): PayloadItem[] => {
@@ -83,7 +84,7 @@ async function transform(bytes: Uint8Array, stream: CompressionStream | Decompre
 
 // 先頭1文字で形式を表す：z＝圧縮あり、j＝圧縮なし（圧縮が使えない古いブラウザ用）
 export async function encodeStudentPlan(plan: PracticePlan, menus: PracticeMenu[], withNotes: boolean) {
-  const json = new TextEncoder().encode(JSON.stringify(buildPayload(plan, menus, withNotes)))
+  const json = new TextEncoder().encode(JSON.stringify(buildStudentPayload(plan, menus, withNotes)))
   if (typeof CompressionStream === 'function') {
     try {
       return 'z' + toBase64Url(await transform(json, new CompressionStream('deflate-raw')))
@@ -106,34 +107,39 @@ export async function decodeStudentPlan(code: string): Promise<StudentPlan | nul
     const bytes = fromBase64Url(code.slice(1))
     const raw = code[0] === 'z' ? await transform(bytes, new DecompressionStream('deflate-raw')) : code[0] === 'j' ? bytes : null
     if (!raw) return null
-    const data = JSON.parse(new TextDecoder().decode(raw)) as Partial<Payload>
-    if (data.v !== 1 || !Array.isArray(data.i)) return null
-    const official = officialMenus()
-    const items = data.i.slice(0, 100).flatMap((x): StudentItem[] => {
-      if (!x || !isText(x.m)) return []
-      const base = official.get(x.m)
-      const c = x.c && typeof x.c === 'object' ? x.c : null
-      let menu: StudentMenu | null = c
-        ? {
-            title: text(c.title) || '（メニュー名なし）',
-            category: text(c.category),
-            purpose: text(c.purpose),
-            setup: text(c.setup),
-            instructions: text(c.instructions),
-            coachingPoints: Array.isArray(c.coachingPoints) ? c.coachingPoints.filter(isText) : [],
-          }
-        : base
-          ? toStudentMenu(base)
-          : null
-      if (menu) {
-        const animation = normalizeAnimation(x.a)
-        const videos = normalizeVideos(x.v)
-        menu = { ...menu, ...(animation && { animation }), ...(videos && { videos }) }
-      }
-      return [{ menuId: x.m, duration: typeof x.d === 'number' ? x.d : 0, ...(isText(x.n) && x.n && { note: x.n }), menu }]
-    })
-    return { title: text(data.t), date: text(data.d), items }
+    return studentPlanFromPayload(JSON.parse(new TextDecoder().decode(raw)))
   } catch {
     return null
   }
+}
+
+// 中身を確かめながら、生徒のページで表示する形にする（形が違えば null）
+export function studentPlanFromPayload(raw: unknown): StudentPlan | null {
+  const data = (raw && typeof raw === 'object' ? raw : {}) as Partial<StudentPayload>
+  if (data.v !== 1 || !Array.isArray(data.i)) return null
+  const official = officialMenus()
+  const items = data.i.slice(0, 100).flatMap((x): StudentItem[] => {
+    if (!x || !isText(x.m)) return []
+    const base = official.get(x.m)
+    const c = x.c && typeof x.c === 'object' ? x.c : null
+    let menu: StudentMenu | null = c
+      ? {
+          title: text(c.title) || '（メニュー名なし）',
+          category: text(c.category),
+          purpose: text(c.purpose),
+          setup: text(c.setup),
+          instructions: text(c.instructions),
+          coachingPoints: Array.isArray(c.coachingPoints) ? c.coachingPoints.filter(isText) : [],
+        }
+      : base
+        ? toStudentMenu(base)
+        : null
+    if (menu) {
+      const animation = normalizeAnimation(x.a)
+      const videos = normalizeVideos(x.v)
+      menu = { ...menu, ...(animation && { animation }), ...(videos && { videos }) }
+    }
+    return [{ menuId: x.m, duration: typeof x.d === 'number' ? x.d : 0, ...(isText(x.n) && x.n && { note: x.n }), menu }]
+  })
+  return { title: text(data.t), date: text(data.d), items }
 }
