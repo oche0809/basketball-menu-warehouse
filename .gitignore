@@ -26,3 +26,4 @@ dist-ssr
 # 環境変数・秘密情報（公開しない）
 .env
 .env.*
+dist-artifact

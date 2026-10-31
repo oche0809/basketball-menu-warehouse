@@ -2,6 +2,9 @@ import { useState, type ReactNode } from 'react'
 import type { MenuVideo } from '../types/menu'
 import { MAX_VIDEOS, fetchYoutubeInfo, isWebUrl, youtubeId } from '../utils/referenceVideos'
 
+// Claudeのサイト版（npm run build:artifact）は YouTube の埋め込み・サムネイルが使えないので、「YouTubeで開く」だけにする
+const CAN_EMBED = import.meta.env.VITE_ARTIFACT !== '1'
+
 const buttonClass = 'inline-flex min-h-11 items-center justify-center rounded-lg border px-4 font-bold'
 
 // 参考動画1本。最初はサムネイルだけを出し、押したときだけ YouTube を読み込む（通信量を抑える）
@@ -10,7 +13,7 @@ export function VideoItem({ video }: { video: MenuVideo }) {
   const id = youtubeId(video.url)
   return (
     <li className="space-y-2">
-      {id &&
+      {id && CAN_EMBED &&
         (playing ? (
           <div className="aspect-video overflow-hidden rounded-lg bg-black">
             <iframe
@@ -145,7 +148,7 @@ export function VideoEditorDialog({ initial, personal, hasOfficial, onSave, onCl
           <ol className="space-y-2">
             {list.map((v, i) => (
               <li key={v.url} className="flex items-center gap-2 rounded-lg border border-slate-200 p-2">
-                {youtubeId(v.url) ? (
+                {youtubeId(v.url) && CAN_EMBED ? (
                   <img src={`https://i.ytimg.com/vi/${youtubeId(v.url)}/mqdefault.jpg`} alt="" className="h-12 w-20 shrink-0 rounded object-cover" />
                 ) : (
                   <span className="grid h-12 w-20 shrink-0 place-items-center rounded bg-slate-100 text-xl">🔗</span>

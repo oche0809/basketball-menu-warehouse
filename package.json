@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "check:videos": "node scripts/check-videos.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build:artifact": "tsc -b && VITE_ARTIFACT=1 vite build --base=./ --outDir dist-artifact"
   },
   "dependencies": {
     "qrcode-generator": "^2.0.4",
