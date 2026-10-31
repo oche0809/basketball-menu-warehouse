@@ -6,13 +6,14 @@ import { createLibraryMenus } from '../src/data/libraryMenus'
 import { createLibraryMenus2 } from '../src/data/libraryMenus2'
 import { createLibraryMenus3 } from '../src/data/libraryMenus3'
 import { createLibraryMenus4 } from '../src/data/libraryMenus4'
+import { createLibraryMenus5 } from '../src/data/libraryMenus5'
 import { createSampleMenus } from '../src/data/sampleMenus'
 import { CATEGORIES } from '../src/data/options'
 import { validateAnimation } from '../src/utils/animation'
 import { normalizeVideos, youtubeId } from '../src/utils/referenceVideos'
 
 // アプリに入っている公式データが壊れていないか
-const menus = [...createSampleMenus(), ...createLibraryMenus(), ...createLibraryMenus2(), ...createLibraryMenus3(), ...createLibraryMenus4()]
+const menus = [...createSampleMenus(), ...createLibraryMenus(), ...createLibraryMenus2(), ...createLibraryMenus3(), ...createLibraryMenus4(), ...createLibraryMenus5()]
 const ids = new Set(menus.map((m) => m.id))
 
 describe('公式データ', () => {

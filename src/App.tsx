@@ -97,6 +97,7 @@ export default function App() {
         onToggleFavorite={toggleFavorite}
         favoritesOnly={page === 'favorites'}
         initialCategory={params.get('category') ?? undefined}
+        initialTag={params.get('tag') ?? undefined}
         onAddMenus={page === 'favorites' ? undefined : (inputs) => inputs.forEach(addMenu)}
         onSaveAnimations={
           page === 'favorites'

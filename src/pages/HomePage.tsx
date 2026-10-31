@@ -8,7 +8,7 @@ export function HomePage({ menus }: { menus: PracticeMenu[] }) {
   return (
     <div className="space-y-8">
       <section className="rounded-2xl bg-gradient-to-br from-orange-600 to-orange-500 px-6 py-8 text-white shadow">
-        <h1 className="text-2xl font-bold sm:text-3xl">バスケットボール メニュー倉庫</h1>
+        <h1 className="text-2xl font-bold sm:text-3xl">NANGO BASKETBALL</h1>
         <p className="mt-2 text-orange-50">練習メニューを、探す・ためる。</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <a href="#/menus" className="rounded-lg bg-white px-6 py-3 text-center font-bold text-orange-700 hover:bg-orange-50">
@@ -28,6 +28,16 @@ export function HomePage({ menus }: { menus: PracticeMenu[] }) {
         <a href="#/favorites" className="rounded-xl border border-slate-200 bg-white p-4 hover:border-orange-300">
           <div className="text-sm text-slate-500">お気に入り</div>
           <div className="text-3xl font-bold text-rose-500">{favoriteCount}<span className="ml-1 text-base font-normal text-slate-800">件</span></div>
+        </a>
+        <a
+          href={`#/menus?tag=${encodeURIComponent('自主練')}`}
+          className="col-span-2 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 hover:border-orange-300"
+        >
+          <span>
+            <span className="block font-bold">🏠 自主練メニュー（家でできる）</span>
+            <span className="text-sm text-slate-500">ボールだけの個人練習と、体幹・筋トレ・ストレッチ（{menus.filter((m) => m.tags.includes('自主練')).length}件）</span>
+          </span>
+          <span className="text-orange-700">→</span>
         </a>
         <a href="#/players" className="col-span-2 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 hover:border-orange-300">
           <span>

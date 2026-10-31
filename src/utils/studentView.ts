@@ -2,6 +2,7 @@ import { createLibraryMenus } from '../data/libraryMenus'
 import { createLibraryMenus2 } from '../data/libraryMenus2'
 import { createLibraryMenus3 } from '../data/libraryMenus3'
 import { createLibraryMenus4 } from '../data/libraryMenus4'
+import { createLibraryMenus5 } from '../data/libraryMenus5'
 import { createSampleMenus } from '../data/sampleMenus'
 import type { MenuAnimation, MenuVideo, PracticeMenu, PracticePlan } from '../types/menu'
 import { normalizeAnimation } from './animation'
@@ -32,7 +33,7 @@ export type StudentPayload = { v: 1; t: string; d: string; i: PayloadItem[] }
 let officialCache: Map<string, PracticeMenu> | null = null
 function officialMenus() {
   officialCache ??= new Map(
-    [...createSampleMenus(), ...createLibraryMenus(), ...createLibraryMenus2(), ...createLibraryMenus3(), ...createLibraryMenus4()].map((m) => [m.id, m]),
+    [...createSampleMenus(), ...createLibraryMenus(), ...createLibraryMenus2(), ...createLibraryMenus3(), ...createLibraryMenus4(), ...createLibraryMenus5()].map((m) => [m.id, m]),
   )
   return officialCache
 }

@@ -74,17 +74,19 @@ type Props = {
   onToggleFavorite: (id: string) => void
   favoritesOnly?: boolean
   initialCategory?: string
+  // 最初から選んでおくタグ（例：ホームの「自主練メニュー」から来たとき）
+  initialTag?: string
   onAddMenus?: (inputs: MenuInput[]) => void
   // 動きがないメニューへの一括保存（保存した件数を返す）
   onSaveAnimations?: (items: { id: string; animation: MenuAnimation }[]) => number
 }
 
-export function MenuListPage({ menus, onToggleFavorite, favoritesOnly, initialCategory, onAddMenus, onSaveAnimations }: Props) {
+export function MenuListPage({ menus, onToggleFavorite, favoritesOnly, initialCategory, initialTag, onAddMenus, onSaveAnimations }: Props) {
   const [videoOpen, setVideoOpen] = useState(false)
   const [bulkOpen, setBulkOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState(initialCategory && CATEGORIES.includes(initialCategory) ? initialCategory : ALL)
-  const [conditions, setConditions] = useState<Conditions>(EMPTY_CONDITIONS)
+  const [conditions, setConditions] = useState<Conditions>(() => (initialTag ? { ...EMPTY_CONDITIONS, tags: [initialTag] } : EMPTY_CONDITIONS))
   // PCでは最初から条件を開いておく
   const [showConditions, setShowConditions] = useState(() => window.matchMedia('(min-width: 1024px)').matches)
 

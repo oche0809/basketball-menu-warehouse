@@ -3,6 +3,7 @@ import { LIBRARY_VERSION, createLibraryMenus } from '../data/libraryMenus'
 import { LIBRARY2_VERSION, createLibraryMenus2 } from '../data/libraryMenus2'
 import { LIBRARY3_VERSION, createLibraryMenus3 } from '../data/libraryMenus3'
 import { LIBRARY4_VERSION, createLibraryMenus4 } from '../data/libraryMenus4'
+import { LIBRARY5_VERSION, createLibraryMenus5 } from '../data/libraryMenus5'
 import { createSampleMenus } from '../data/sampleMenus'
 import type { MenuInput, PracticeMenu } from '../types/menu'
 
@@ -15,6 +16,7 @@ const LIBRARY_PACKS = [
   { key: 'basketball-menu-warehouse-library-2', version: LIBRARY2_VERSION, create: createLibraryMenus2 },
   { key: 'basketball-menu-warehouse-library-3', version: LIBRARY3_VERSION, create: createLibraryMenus3 },
   { key: 'basketball-menu-warehouse-library-4', version: LIBRARY4_VERSION, create: createLibraryMenus4 },
+  { key: 'basketball-menu-warehouse-library-5', version: LIBRARY5_VERSION, create: createLibraryMenus5 },
 ]
 
 export function loadJSON(key: string): unknown {

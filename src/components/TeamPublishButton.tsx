@@ -17,7 +17,7 @@ function TokenSetup({ onSaved }: { onSaved: (token: string) => void }) {
       <ol className="list-decimal space-y-1 rounded-lg bg-stone-50 p-3 pl-8 text-slate-700">
         <li>下のボタンから GitHub の「New fine-grained personal access token」を開く</li>
         <li>
-          Token name：<b>メニュー倉庫 チームページ</b>／Expiration：<b>1年</b>（期限が来たら作り直し）
+          Token name：<b>NANGO BASKETBALL チームページ</b>／Expiration：<b>1年</b>（期限が来たら作り直し）
         </li>
         <li>
           Repository access：<b>Only select repositories</b> → <b>basketball-menu-warehouse</b>

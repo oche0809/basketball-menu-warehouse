@@ -20,7 +20,7 @@ export function Layout({ current, actions, children }: { current: string; action
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 lg:px-8">
           <a href="#/" className="flex min-w-0 items-center gap-2 text-base font-bold sm:text-lg">
             <span aria-hidden>🏀</span>
-            <span className="truncate">バスケットボール メニュー倉庫</span>
+            <span className="truncate">NANGO BASKETBALL</span>
           </a>
           <nav className="ml-auto hidden items-center gap-1 md:flex">
             {NAV.map((n) =>
